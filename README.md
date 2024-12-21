@@ -1,4 +1,4 @@
-# Imageboard
+# 0chan Imageboard
 ![Screenshot](screenshot.png)
 
 ## Features
@@ -13,9 +13,11 @@
 
 ## Coming soon:
 - Customizable name when creating new thread/commenting
-- Unsecured and Secured Tripcodes
+- Unsecured and Secured tripcodes
 - Being able to see archived threads
-- Screen warning for NSFW boards 
+- Screen warning for NSFW boards
+- Moderator will able to see thread author IP address near their username. 
+- Change date style to [MM/DD/YY] [Day of the week] [TIME]
 
 ## Guide
 1. Clone the repository and access the folder:
