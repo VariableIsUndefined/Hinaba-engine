@@ -353,7 +353,7 @@ def post_reply(board_name, refnum):
         "image": save_path,
         "content": content,
         "short_content": short_content,
-        "date": datetime.now(tz=UTC).strftime("%m/%d/%y (%a) %H:%M:%S"), 
+        "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"),
     }
 
     reply = Post(**data)
