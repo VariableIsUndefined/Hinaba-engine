@@ -7,7 +7,7 @@ from os import path, mkdir
 from string import punctuation
 from waitress import serve
 from models import db, Post, Anon, Board, Report, Captcha
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
 from random import randint
 
@@ -32,7 +32,7 @@ def get_current_user(req):
     try:
         current_user = Anon.get(Anon.ip == ip)
     except:
-        anon = Anon(ip = ip, name = random_name())
+        anon = Anon(ip = ip, name = "Anonymous")
         anon.save()
 
         current_user = anon
@@ -270,6 +270,7 @@ def post_thread(board_name):
         "title": title,
         "content": content,
         "short_content": short_content,
+        "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"), 
     }
 
     thread = Post(**data)
@@ -334,12 +335,13 @@ def post_reply(board_name, refnum):
 
     filename = ""
     save_path = ""
+    
+    if upload is not None:
+        if upload.content_type.startswith('image') or upload.content_type.startswith('video'):
 
-    if upload.content_type.startswith('image') or upload.content_type.startswith('video'):
-
-        save_path = file_validation(board_name, no, upload, is_reply=True)
-        if save_path == 1: return redirect(f'{basename}/{board_name}/thread/{refnum}')
-        filename = upload.filename
+            save_path = file_validation(board_name, no, upload, is_reply=True)
+            if save_path == 1: return redirect(f'{basename}/{board_name}/thread/{refnum}')
+            filename = upload.filename
 
     data = {
         "board": board,
@@ -351,6 +353,7 @@ def post_reply(board_name, refnum):
         "image": save_path,
         "content": content,
         "short_content": short_content,
+        "date": datetime.now(tz=UTC).strftime("%m/%d/%y (%a) %H:%M:%S"), 
     }
 
     reply = Post(**data)
