@@ -11,6 +11,12 @@
 - Captcha
 - Mobile responsive design (through CSS media queries)
 
+## Coming soon:
+- Customizable name when creating new thread/commenting
+- Unsecured and Secured Tripcodes
+- Being able to see archived threads
+- Screen warning for NSFW boards 
+
 ## Guide
 1. Clone the repository and access the folder:
 
