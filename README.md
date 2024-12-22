@@ -17,7 +17,7 @@
 - Being able to see archived threads
 - Screen warning for NSFW boards
 - Moderator will able to see thread author IP address near their username. 
-- Change date style to [MM/DD/YY] [Day of the week] [TIME]
+- Change date style to [MM/DD/YY] [Day of the week] [TIME] (DONE)
 
 ## Guide
 1. Clone the repository and access the folder:
