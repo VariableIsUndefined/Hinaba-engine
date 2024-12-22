@@ -1,5 +1,5 @@
 # 0chan Imageboard
-![Screenshot](screenshot.png)
+![Screenshot](screenshot_new.png)
 
 ## Features
 - Simple markdown: bold (**), italic (*) and underline (__)
