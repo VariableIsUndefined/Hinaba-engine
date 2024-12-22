@@ -15,7 +15,7 @@ config.load_config('imageboard.conf')
 if config['database.engine'] == 'sqlite':
 
     db = SqliteDatabase(f'{config["database.name"]}.db')
-
+    
 elif config['database.engine'] == 'postgresql':
 
     db = PostgresqlDatabase(

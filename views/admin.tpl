@@ -46,7 +46,7 @@
   </tbody>
 </table>
 <h3 class="Title">Boards</h3>
-<form class="Ban-form" action="{{basename}}/add_board" method="POST">
+<form class="Ban-form" action="{{basename}}/add_board" method="POST" enctype="multipart/form-data">
 	<input name="name" type="text" placeholder="board name" required>
 	<input name="title" type="text" placeholder="board title" required>
 	NSFW: <input name="nsfw" type="checkbox" placeholder="board title">
