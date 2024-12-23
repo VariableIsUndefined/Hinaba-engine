@@ -6,6 +6,7 @@
 - Green (>) and Pink (<) text
 - Quick replies
 - Reply previews
+- Closing/pinning threads
 - Mod and Admin functions
 - Youtube embeds
 - Captcha
@@ -25,6 +26,7 @@
 - Janitors/Mods actions logging
 - More text formatting
 - Updated design
+- Error 404 page
 
 ## Guide
 1. Clone the repository and access the folder:
