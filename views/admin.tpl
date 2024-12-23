@@ -2,7 +2,7 @@
 % from models import Board
 <h3 class="Title">Mods</h3>
 <form class="Ban-form" action="{{basename}}/new_mod" method="POST">
-	<input name="user" type="text" placeholder="user">
+	<input name="ip" type="text" placeholder="ip">
   <select name="board">
     % for board in Board.select():
     <option value="{{board.name}}">{{board.name}}</option>
@@ -14,7 +14,6 @@
   <thead>
     <tr>
       <th>IP</th>
-      <th>User</th>
       <td>Mod</td>
       <td>Role</td>
       <td></td>
@@ -24,7 +23,6 @@
     % for mod in mods:
       <tr>
       	<td>{{mod.ip}}</td>
-      	<td>{{mod.name}}</td>
       	<td>{{mod.mod.replace("::", ", ").strip(':')}}</td>
         <td>
           <form action="{{basename}}/mod" method="POST">
@@ -33,11 +31,11 @@
               <option value="{{board.name}}">{{board.name}}</option>
               % end
             </select>
-	    <input type="text" name="user" value="{{mod.name}}" hidden>
+	          <input type="text" name="ip" value="{{mod.ip}}" hidden>
             <input type="submit" name="rm" value="Remove">
             <input type="submit" name="add" value="Add">
-        </td>
-        <td>
+            </td>
+            <td>
             <input type="submit" name="rmall" value="Remove all">
           </form>
         </td>

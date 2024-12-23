@@ -143,4 +143,10 @@ def short_msg(string):
     return ' '.join(string.split(" ")[:22]) + ellipsis
 
 def generate_trip_code(password):
+    password = password.replace('"', "&quot;") \
+        .replace("'", "'")      \
+        .replace("<", "&lt;")   \
+        .replace(">", "&gt;")   \
+        .replace(",", ",")
+        
     return "!" + tripcode(password)

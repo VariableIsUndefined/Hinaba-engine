@@ -1,5 +1,5 @@
 # 0chan Imageboard
-![Screenshot](screenshot_new.png)
+![Screenshot](image.png)
 
 ## Features
 - Simple markdown: bold (**), italic (*) and underline (__)
@@ -10,14 +10,21 @@
 - Youtube embeds
 - Captcha
 - Mobile responsive design (through CSS media queries)
+- Tripcodes (unsecured only, for now)
 
-## Coming soon:
-- Customizable name when creating new thread/commenting
-- Unsecured and Secured tripcodes
-- Being able to see archived threads
+## TODO:
+- Threads archieve
 - Screen warning for NSFW boards
-- Moderator will able to see thread author IP address near their username. 
-- Change date style to [MM/DD/YY] [Day of the week] [TIME] (DONE)
+- Moderator able to see thread author IP address near their username.
+- Roles: Janitor, Moderator, Administrator
+- Thread searching
+- Oekaki (drawing in browser)
+- API
+- Interface management
+- Live threads update
+- Janitors/Mods actions logging
+- More text formatting
+- Updated design
 
 ## Guide
 1. Clone the repository and access the folder:

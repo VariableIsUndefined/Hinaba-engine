@@ -539,11 +539,11 @@ def mod():
     if check_admin(request) == 1:
         return abort(403, "You are not allowed to do this.")
 
-    user = request.forms.get("user").strip()
+    ip = request.forms.get("ip").strip()
     board = request.forms.get("board")
     opts = request.forms
 
-    anon = Anon.get(Anon.name == user)
+    anon = Anon.get(Anon.ip == ip)
 
     if bool(opts.get("add")) and f':{board}:' not in anon.mod:
         anon.mod += f':{board}:'
@@ -562,11 +562,11 @@ def add_mod():
     if check_admin(request) == 1:
         return abort(403, "You are not allowed to do this.")
 
-    user = request.forms.get("user").strip()
+    ip = request.forms.get("ip")
     board = request.forms.get("board")
 
     try:
-        anon = Anon.get(Anon.name == user)
+        anon = Anon.get(Anon.ip == ip)
     except:
         return abort(404, "User does not exist.")
 
