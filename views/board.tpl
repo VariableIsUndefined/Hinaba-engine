@@ -9,6 +9,12 @@
   <table>
     <tbody>
       <tr>
+        <th>Name</th>
+        <td>
+          <input type="text" name="author">
+        </td>
+      </tr>
+      <tr>
         <th>Title</th>
         <td>
           <input type="text" name="title" required> <button id="btnPost">Post</button>

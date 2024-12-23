@@ -23,19 +23,11 @@
     % if thread_ref.is_reply:
       % main_thread = board.posts.where(Post.refnum == thread_ref.replyrefnum).get()
       <a class="reference" href="{{basename}}/{{board_name}}/thread/{{thread_ref.replyrefnum}}#{{ref}}">{{word}}
-      % if main_thread.author.name == thread_ref.author.name:
-      (OP)
-      % end
-      % if thread_ref.author.name == current_user.name and main_thread.author.name != current_user.name:
-      (YOU)
-      % end
       </a>
     % else:
       <a class="reference" href="{{basename}}/{{board_name}}/thread/{{ref}}">{{word}}
       % if ref == thread.replyrefnum:
        (OP)
-      % elif thread_ref.author.name == current_user.name:
-       (YOU)
       % end
       </a>
     % end

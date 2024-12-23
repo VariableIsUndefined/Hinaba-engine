@@ -28,7 +28,7 @@
     <div class="Thread-info">
     <input type="checkbox" name="{{thread.refnum}}" value="delete">
     <span class="Hilo-title">{{thread.title}}</span>
-    <span class="Author" style="background-color: {{author_color(thread.author.name)}};">{{thread.author.name}}</span>
+    <span class="Author" style="background-color: {{author_color(thread.author_name)}};">{{thread.author_name}}</span>
                 
     % if f':{board_name}:' in thread.author.mod:
     <span class="role">Mod</span>

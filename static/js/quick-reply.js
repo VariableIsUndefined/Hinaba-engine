@@ -4,7 +4,7 @@ function window_reply(button, board_name, thread_refnum, post_refnum){
   var maxsize = $(document).find("#max-size").text()
   var chars = post_refnum.length + 3
 
-  $(button).parents(".Thread").before('<div id="reply-window"> <div id="window-header">Reply to thread #'+thread_refnum+'<span class="dclose">X</span></div> <form method="POST" action="/'+board_name+'/thread/'+thread_refnum+'" enctype="multipart/form-data"> <table> <tbody> <tr> <th>Comment</th> <td><textarea maxlength="'+maxlength+'" id="texta2" rows="6" name="content" required>>>'+post_refnum+'\n</textarea><br><small style="opacity:.5;">Max message length: <span id="count2">'+chars+'</span>/'+maxlength+'</small></td> </tr><tr><th>File</th><td><small>'+maxsize+'</small><br><input type="file" name="upload"> <input type="submit" value="Reply"></td> </tr> </tbody> </table> </form> </div>')
+  $(button).parents(".Thread").before('<div id="reply-window"> <div id="window-header">Reply to thread #'+thread_refnum+'<span class="dclose">X</span></div> <form method="POST" action="/'+board_name+'/thread/'+thread_refnum+'" enctype="multipart/form-data"> <table> <tbody> <tr> <th>Name</th> <td> <input type="text" name="author"> </td> </tr> <tr> <th>Comment</th> <td><textarea maxlength="'+maxlength+'" id="texta2" rows="6" name="content" required>>>'+post_refnum+'\n</textarea><br><small style="opacity:.5;">Max message length: <span id="count2">'+chars+'</span>/'+maxlength+'</small></td> </tr><tr><th>File</th><td><small>'+maxsize+'</small><br><input type="file" name="upload"> <input type="submit" value="Reply"></td> </tr> </tbody> </table> </form> </div>')
 
   window_width = $("#reply-window").width();
   $("#reply-window").css("left", $(window).width() - window_width - 8);

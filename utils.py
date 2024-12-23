@@ -6,6 +6,7 @@ import shutil
 import filetype
 from string import ascii_lowercase
 from PIL import Image
+from tripcode import tripcode
 
 def thumbnail(path, refnum, ext, is_reply=False):
 
@@ -140,3 +141,6 @@ def short_msg(string):
     if len(string.split(" ")) > 22: ellipsis = " ..."
 
     return ' '.join(string.split(" ")[:22]) + ellipsis
+
+def generate_trip_code(password):
+    return "!" + tripcode(password)

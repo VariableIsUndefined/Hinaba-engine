@@ -37,7 +37,7 @@ elif config['database.engine'] == 'mysql':
     )
 
 class Anon(Model):
-    name = CharField()
+    #name = CharField()
     ip = IPField()
     banned = BooleanField(default=False)
     mod = CharField(default="")
@@ -59,6 +59,7 @@ class Board(Model):
 class Post(Model):
     board = ForeignKeyField(Board, backref='posts')
     author = ForeignKeyField(Anon, backref='posts')
+    author_name = CharField()
     refnum = IntegerField()
     replyrefnum = IntegerField(null=True)
     date = DateTimeField(default=datetime.datetime.now)

@@ -1,7 +1,7 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error)
-from utils import random_name, file_validation, remove_media, board_directory, get_directory_size
+from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip_code
 from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
@@ -32,7 +32,7 @@ def get_current_user(req):
     try:
         current_user = Anon.get(Anon.ip == ip)
     except:
-        anon = Anon(ip = ip, name = "Anonymous")
+        anon = Anon(ip = ip)
         anon.save()
 
         current_user = anon
@@ -241,12 +241,23 @@ def post_thread(board_name):
     title = request.forms.get('title')
     content = request.forms.get('content')
     upload = request.files.get('upload')
+    author_name = request.forms.get('author')
 
     if not all([title, content]): return abort(400, "Incomplete post.")
 
     if len(content) > int(config['threads.content_max_length']):
             return abort(400, "The content exeeds the maximum length.")
 
+    if author_name:   
+        author_name = author_name[:18].strip()
+        # Checking for tripcode
+        if '#' in author_name:
+            name_and_trip = author_name.split('#')[:2]
+            name_and_trip[1] = generate_trip_code(name_and_trip[1])
+            author_name = ''.join(name_and_trip)
+    else:
+        author_name = "Anonymous"
+    
     author = current_user
     refnum = board.lastrefnum
     save_path = file_validation(board_name, refnum, upload)
@@ -264,6 +275,7 @@ def post_thread(board_name):
     data = {
         "board": board,
         "author": author,
+        "author_name": author_name,
         "refnum": refnum,
         "filename": upload.filename,
         "image": save_path,
@@ -314,6 +326,7 @@ def post_reply(board_name, refnum):
         return abort(423, "You cannot reply because this thread is locked.")
 
     content = request.forms.get('content')
+    author_name = request.forms.get('author')
 
     if not bool(content): return redirect(f'{basename}/{board_name}/')
 
@@ -329,6 +342,16 @@ def post_reply(board_name, refnum):
             short_content = '\n'.join(content.split('\n')[:10])
 
     upload = request.files.get('upload')
+    
+    if author_name:   
+        author_name = author_name[:18].strip()
+        # Checking for tripcode
+        if '#' in author_name:
+            name_and_trip = author_name.split('#')[:2]
+            name_and_trip[1] = generate_trip_code(name_and_trip[1])
+            author_name = ''.join(name_and_trip)
+    else:
+        author_name = "Anonymous"
 
     author = current_user
     no = board.lastrefnum
@@ -346,6 +369,7 @@ def post_reply(board_name, refnum):
     data = {
         "board": board,
         "author": author,
+        "author_name": author_name,
         "refnum": no,
         "is_reply": True,
         "replyrefnum": refnum,

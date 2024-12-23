@@ -6,6 +6,12 @@
   <table>
     <tbody>
       <tr>
+        <th>Name</th>
+        <td>
+          <input type="text" name="author">
+        </td>
+      </tr>
+      <tr>
         <th>Comment</th>
         <td><textarea maxlength="{{maxlength}}" id="texta1" rows="6" name="content" required></textarea><br><small style="opacity:.5;">Max message length: <span id="count1">0</span>/{{maxlength}}</small></td>
       </tr>
