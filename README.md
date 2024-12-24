@@ -12,11 +12,11 @@
 - Captcha
 - Mobile responsive design (through CSS media queries)
 - Tripcodes (unsecured only, for now)
+- Mods are able to see poster's IP
 
 ## TODO:
 - Threads archieve
 - Screen warning for NSFW boards
-- Moderator able to see thread author IP address near their username.
 - Roles: Janitor, Moderator, Administrator
 - Thread searching
 - Oekaki (drawing in browser)
