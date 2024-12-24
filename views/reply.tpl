@@ -6,9 +6,12 @@
 	<div class="Respuesta-cuerpo">
   <input type="checkbox" name="{{reply.refnum}}" value="delete">
 	<span class="Author" style="background-color: {{author_color(reply.author_name)}};">{{reply.author_name}}</span>
-	    % if f':{board_name}:' in reply.author.mod:
-		    <span class="role">Mod</span>
-	    % end
+  % if f':{board_name}:' in current_user.mod:
+  (IP: {{ thread.author.ip }})
+  % end 
+  % if f':{board_name}:' in reply.author.mod:
+    <span class="role">Mod</span>
+  % end
 	{{reply.date}} <a style="color:black;" href="{{basename}}/{{board_name}}/thread/{{reply.replyrefnum}}#{{reply.refnum}}">No.</a> <span class="dopen">{{reply.refnum}}</span>
   [<span class="hide-reply" title="Hide reply">=</span>]
 	% if reply.image:

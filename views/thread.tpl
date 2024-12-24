@@ -29,10 +29,12 @@
     <input type="checkbox" name="{{thread.refnum}}" value="delete">
     <span class="Hilo-title">{{thread.title}}</span>
     <span class="Author" style="background-color: {{author_color(thread.author_name)}};">{{thread.author_name}}</span>
-                
-    % if f':{board_name}:' in thread.author.mod:
-    <span class="role">Mod</span>
-    % end
+    % if f':{board_name}:' in current_user.mod:
+    (IP: {{ thread.author.ip }})
+    % end            
+  % if f':{board_name}:' in thread.author.mod:
+  <span class="role">Mod</span>
+  % end
   {{thread.date}} No. <span class="dopen">{{thread.refnum}}</span>
   % if thread.pinned:
     <img class="pin" src="{{basename}}/static/img/sticky.gif"></img>
