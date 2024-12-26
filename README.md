@@ -1,4 +1,4 @@
-# 0chan Imageboard
+# PyChan - Imageboard Engine made with Python
 ![Screenshot](image.png)
 
 ## Features
@@ -12,11 +12,11 @@
 - Captcha
 - Mobile responsive design (through CSS media queries)
 - Tripcodes (unsecured only, for now)
+- Mods are able to see poster's IP
 
 ## TODO:
 - Threads archieve
 - Screen warning for NSFW boards
-- Moderator able to see thread author IP address near their username.
 - Roles: Janitor, Moderator, Administrator
 - Thread searching
 - Oekaki (drawing in browser)
@@ -31,9 +31,9 @@
 ## Guide
 1. Clone the repository and access the folder:
 
-`$ git clone https://github.com/gnstaxo/imageboard.git`
+`$ git clone https://github.com/VariableIsUndefined/PyChan-engine.git`
 
-`$ cd imageboard`
+`$ cd PyChan-engine`
 
 2. Get the dependencies
 
