@@ -1,4 +1,4 @@
-# 0chan Imageboard
+# PyChan - Imageboard Engine made with Python
 ![Screenshot](image.png)
 
 ## Features
@@ -31,9 +31,9 @@
 ## Guide
 1. Clone the repository and access the folder:
 
-`$ git clone https://github.com/gnstaxo/imageboard.git`
+`$ git clone https://github.com/VariableIsUndefined/PyChan-engine.git`
 
-`$ cd imageboard`
+`$ cd PyChan-engine`
 
 2. Get the dependencies
 
