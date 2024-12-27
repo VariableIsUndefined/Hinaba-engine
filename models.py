@@ -93,5 +93,12 @@ class Captcha(Model):
     class Meta:
         database = db
 
+class Stylesheet(Model):
+    title = CharField()
+    filename  = CharField()
+    
+    class Meta:
+        database = db
+
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha])
+    db.create_tables([Report, Post, Board, Anon, Captcha, Stylesheet])

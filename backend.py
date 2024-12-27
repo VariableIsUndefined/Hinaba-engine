@@ -1,7 +1,7 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error)
-from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip_code
+from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip
 from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
@@ -249,12 +249,7 @@ def post_thread(board_name):
             return abort(400, "The content exeeds the maximum length.")
 
     if author_name:   
-        author_name = author_name[:18].strip()
-        # Checking for tripcode
-        if '#' in author_name:
-            name_and_trip = author_name.split('#')[:2]
-            name_and_trip[1] = generate_trip_code(name_and_trip[1])
-            author_name = ''.join(name_and_trip)
+        author_name = generate_trip(author_name)
     else:
         author_name = "Anonymous"
     
@@ -344,12 +339,7 @@ def post_reply(board_name, refnum):
     upload = request.files.get('upload')
     
     if author_name:   
-        author_name = author_name[:18].strip()
-        # Checking for tripcode
-        if '#' in author_name:
-            name_and_trip = author_name.split('#')[:2]
-            name_and_trip[1] = generate_trip_code(name_and_trip[1])
-            author_name = ''.join(name_and_trip)
+        author_name = generate_trip(author_name)
     else:
         author_name = "Anonymous"
 

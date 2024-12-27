@@ -1,45 +1,63 @@
 % rebase('base', title=f"/{board_name}/ - {board_title}")
-<h2 class="Title">/{{board_name}}/<br>{{board_title}}
- % if board.nsfw:
-  [<span class="nsfw">NSFW</span>]
- % end
-</h2>
-<hr>
-<form class="Formulario" method="POST" action="{{basename}}/{{board_name}}/" enctype="multipart/form-data">
-  <table>
-    <tbody>
-      <tr>
-        <th>Name</th>
-        <td>
-          <input type="text" name="author">
-        </td>
-      </tr>
-      <tr>
-        <th>Title</th>
-        <td>
-          <input type="text" name="title" required> <button id="btnPost">Post</button>
-        </td>
-      </tr>
-      <tr>
-        <th>Comment</th>
-        <td><textarea id="texta1" maxlength="{{maxlength}}" rows="6" name="content" required></textarea><br><small style="opacity:.5;">Max message length: <span id="count1">0</span>/{{maxlength}}</small></td>
-      </tr>
-      <tr>
-        <th>File</th>
-        <td><small id="max-size">Max file size: {{max_file_size}}MB.</small><br><input type="file" name="upload" required></td>
-      </tr>
-    </tbody>
-  </table>
-</form>
+<body class="is_index board_a yotsuba_new ws">
+  <span id="id_css"></span>
+  <div class="boardBanner">
+    <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>
+    % if board.nsfw:
+      <div class="boardTitle"> [<span class="nsfw">NSFW</span>] </div>
+    % end
+  </div>
+  <hr class="abovePostForm">
+  <div style="position:relative"></div>
+  <form method="POST" action="{{basename}}/{{board_name}}/" enctype="multipart/form-data">
+    <table class="postForm" id="postForm" style="display: table;">
+      <tbody>
+        <tr data-type="Name">
+          <td>Name</td>
+          <td>
+            <input type="text" name="author">
+          </td>
+        </tr>
 
-<div id="container">
-<form action="{{basename}}/{{board_name}}/delete" method="POST">
-% for thread in threads:
-% include('thread', thread=thread, board_name=board_name, board=board)
-% end
-</div>
-<hr>
-<footer>
-% include('pagination', current_page=current_page, board_name=board_name)
-% include('bottom')
-</footer>
+        <tr data-type="Title">
+          <td>Title</td>
+          <td>
+            <input type="text" name="title" required> <button id="btnPost">Post</button>
+          </td>
+        </tr>
+
+        <tr data-type="Comment">
+          <td>Comment</td>
+          <td><textarea id="texta1" maxlength="{{maxlength}}" rows="6" name="content" required></textarea><br><small style="opacity:.5;">Max message length: <span id="count1">0</span>/{{maxlength}}</small></td>
+        </tr>
+
+        <tr data-type="File">
+          <td>File</td>
+          <td><small id="max-size">Max file size: {{max_file_size}}MB.</small><br><input type="file" name="upload" required></td>
+        </tr>
+
+        <tr class="rules">
+          <td colspan="2">
+            <ul class="rules">
+              <li> Please read the Rules and FAQ before posting. </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <hr>
+
+  <div id="container">
+  <form action="{{basename}}/{{board_name}}/delete" method="POST">
+  % for thread in threads:
+  % include('thread', thread=thread, board_name=board_name, board=board)
+  % end
+  </div>
+  <hr>
+  <footer>
+  % include('pagination', current_page=current_page, board_name=board_name)
+  % include('bottom')
+  </footer>
+</body>

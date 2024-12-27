@@ -1,12 +1,16 @@
 import os
 import re
 import random
-import hashlib
+import hashlib, base64
 import shutil
 import filetype
 from string import ascii_lowercase
 from PIL import Image
 from tripcode import tripcode
+from bottle import ConfigDict
+
+config = ConfigDict()
+config.load_config('imageboard.conf')
 
 def thumbnail(path, refnum, ext, is_reply=False):
 
@@ -142,11 +146,38 @@ def short_msg(string):
 
     return ' '.join(string.split(" ")[:22]) + ellipsis
 
-def generate_trip_code(password):
-    password = password.replace('"', "&quot;") \
-        .replace("'", "'")      \
-        .replace("<", "&lt;")   \
-        .replace(">", "&gt;")   \
-        .replace(",", ",")
+def generate_trip(name):
+    name = re.sub(r"[\r\n]", "", name).strip()
+    
+    if re.search(r"\#+$", name):
+        name = re.sub(r"\#+$", "", name)
+    
+    if '#' in name:
+        name = name.replace("&#", "&&")
+        parts = name.replace("&&", "&#").split("#", 2)
         
-    return "!" + tripcode(password)
+        if len(parts) == 2:
+            nametemp, trip = parts
+            sectrip = ""  # Если sectrip отсутствует
+        elif len(parts) == 3:
+            nametemp, trip, sectrip = parts
+        else:
+            nametemp = parts[0]
+            trip = sectrip = ""
+            
+        name = nametemp
+        
+        if trip != "":
+            trip = tripcode(trip)
+            name += f"!{trip}"
+        
+        if sectrip != "":
+            salt = config["security.trip_salt"]
+            
+            if not salt:
+                salt = "ofTSVIrPGK" #Something random
+            
+            sha = base64.b64encode(hashlib.sha1((sectrip + salt).encode()).digest()).decode()[:11]
+            name += f"!!{sha}"
+            
+    return name
