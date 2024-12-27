@@ -1,6 +1,6 @@
 function markdown(){
 
-  var text_thread = $( ".Thread-text" ).toArray();
+  var text_thread = $( ".postMessage" ).toArray();
 
   for ( i = 0; i < text_thread.length; i++) {
 

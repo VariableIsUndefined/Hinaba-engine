@@ -6,7 +6,7 @@ html {
 }
 
 body {
-	background: #FFFFEE url(/image/fade.png) top center repeat-x;
+	background: #FFFFEE url(/static/img/fade.png) top center repeat-x;
 
 	color: #800000;
 	font-family: arial, helvetica, sans-serif;
@@ -671,6 +671,10 @@ div.post blockquote.postMessage {
 
 blockquote > span.quote {
 	color: #789922;
+}
+
+blockquote > span.pink {
+	color: #dd5db9;
 }
 
 .quoteLink, .quotelink, .deadlink, .pageJump a {

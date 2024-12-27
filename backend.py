@@ -1,6 +1,6 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
-        abort, get, post, ConfigDict, response, default_app, error)
+        abort, get, post, ConfigDict, response, default_app, error, template)
 from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip
 from json import loads, dumps
 from os import path, mkdir
@@ -248,8 +248,11 @@ def post_thread(board_name):
     if len(content) > int(config['threads.content_max_length']):
             return abort(400, "The content exeeds the maximum length.")
 
+    trip_info = generate_trip(author_name)
+    trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
+    
     if author_name:   
-        author_name = generate_trip(author_name)
+        author_name = trip_info["author_name"]
     else:
         author_name = "Anonymous"
     
@@ -277,7 +280,9 @@ def post_thread(board_name):
         "title": title,
         "content": content,
         "short_content": short_content,
-        "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"), 
+        "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"),
+        "trip": trip if trip != '' else None,
+        "sec_trip": sec_trip if sec_trip != '' else None,
     }
 
     thread = Post(**data)
@@ -338,8 +343,11 @@ def post_reply(board_name, refnum):
 
     upload = request.files.get('upload')
     
+    trip_info = generate_trip(author_name)
+    trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
+    
     if author_name:   
-        author_name = generate_trip(author_name)
+        author_name = trip_info["author_name"]
     else:
         author_name = "Anonymous"
 
@@ -368,6 +376,8 @@ def post_reply(board_name, refnum):
         "content": content,
         "short_content": short_content,
         "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"),
+        "trip": trip if trip != '' else None,
+        "sec_trip": sec_trip if sec_trip != '' else None,
     }
 
     reply = Post(**data)
@@ -599,6 +609,10 @@ def thread_close(board_name, refnum):
     thread.save()
 
     return redirect(f'{basename}/{board_name}/')
+
+@error(404)
+def error404(error):
+    return template("error.tpl", basename=basename)
 
 if __name__ == '__main__':
 

@@ -56,17 +56,16 @@
   <hr>
 
   <form name="delform" id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
-    <div class="board">
-      % for thread in threads:
-      % include('thread', thread=thread, board_name=board_name, board=board)
-      % end
-    </div>
-  </form>
-
-  <hr>
+  <div class="board">
+    % for thread in threads:
+    % include('thread', thread=thread, board_name=board_name, board=board)
+    <hr>
+    % end
+  </div>
 
   <footer>
   % include('pagination', current_page=current_page, board_name=board_name)
   % include('bottom')
   </footer>
+
 </body>

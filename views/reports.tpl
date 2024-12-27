@@ -17,7 +17,7 @@
     % thread = board.posts.where(Post.refnum == report.refnum).get()
     <tr>
       <td>{{report.refnum}}</td>
-      <td>{{thread.author.name}}</td>
+      <td>{{thread.author.ip}}</td>
       % if thread.is_reply:
         <td>{{Post.get((Post.refnum == thread.replyrefnum) & (Post.board_id == board.id)).title}}	
       % else:

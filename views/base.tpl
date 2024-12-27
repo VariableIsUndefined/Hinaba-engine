@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{basename}}/static/css/global.css">
   <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
   <link rel="shortcut icon" href="{{basename}}/static/favicon.ico">
   <title>{{title}}</title>
@@ -18,7 +17,6 @@
     <script src="{{basename}}/static/js/styles.js"></script>
     % if defined('board_name'):
       <script src="{{basename}}/static/js/captcha.js"></script>
-      <script src="{{basename}}/static/js/hide-post-v1.js"></script>
       <script src="{{basename}}/static/js/youtube.js"></script>
       <script src="{{basename}}/static/js/quick-reply.js"></script>
       <script src="{{basename}}/static/js/expand-images.js"></script>

@@ -43,9 +43,9 @@
 % content = thread.content if is_detail else thread.short_content
 % for line in content.split('\n'):
   % if line.startswith(">") and len(line) > 1 and line[1] != ">":
-    <span class="green-text">{{line}}</span><br>
+    <span class="quote">{{line}}</span><br>
   % elif line.startswith("<"): 
-    <span class="pink-text">{{line}}</span><br>
+    <span class="pink">{{line}}</span><br>
   % elif search(r'(https?://)(www.)?youtu(be.com|.be)/(watch\?v=)?[A-Za-z0-9-_]{11}\s?$', line):
     <div class="yt-container">
       <span class="yt-url"> {{line}}</span> <span class="btn play">Play</span><br>

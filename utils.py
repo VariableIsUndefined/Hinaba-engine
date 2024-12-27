@@ -147,6 +147,12 @@ def short_msg(string):
     return ' '.join(string.split(" ")[:22]) + ellipsis
 
 def generate_trip(name):
+    info = {
+        "author_name": "",
+        "trip": "",
+        "sec_trip": "",
+    }
+    
     name = re.sub(r"[\r\n]", "", name).strip()
     
     if re.search(r"\#+$", name):
@@ -158,19 +164,18 @@ def generate_trip(name):
         
         if len(parts) == 2:
             nametemp, trip = parts
-            sectrip = ""  # Если sectrip отсутствует
+            sectrip = ""
         elif len(parts) == 3:
             nametemp, trip, sectrip = parts
         else:
             nametemp = parts[0]
             trip = sectrip = ""
             
-        name = nametemp
+        info["author_name"] = nametemp
         
         if trip != "":
-            trip = tripcode(trip)
-            name += f"!{trip}"
-        
+            info["trip"] = tripcode(trip)
+                    
         if sectrip != "":
             salt = config["security.trip_salt"]
             
@@ -178,6 +183,6 @@ def generate_trip(name):
                 salt = "ofTSVIrPGK" #Something random
             
             sha = base64.b64encode(hashlib.sha1((sectrip + salt).encode()).digest()).decode()[:11]
-            name += f"!!{sha}"
-            
-    return name
+            info["sec_trip"] = sha
+                        
+    return info

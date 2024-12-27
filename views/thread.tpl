@@ -37,6 +37,12 @@
         <span class="subject">{{thread.title}}</span>
         <span class="nameBlock">
           <span class="name">{{thread.author_name}}</span>
+          % if thread.trip:
+          <span class="postertrip">!{{thread.trip}}</span>
+          % end
+          % if thread.sec_trip:
+          <span class="postertrip">!!{{thread.sec_trip}}</span>
+          % end
         </span>
 
         % if f':{board_name}:' in current_user.mod:
@@ -63,14 +69,9 @@
         % end
 
         % if f':{board_name}:' in current_user.mod:
-          <div class="postMenuBtn">
-            <button class="dropbtn">▶</button>
-            <div class="myDropdown dropdown-content">
-              <a class="dropin" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/pin">Pin</a>
-              <a class="dropc" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/close">Close</a>
-            </div>
-          </div> 
-        % end
+          [<a class="dropin" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/pin">Pin</a>]
+          [<a class="dropc" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/close">Close</a>]
+        % end 
       </div>
 
       <blockquote class="postMessage">

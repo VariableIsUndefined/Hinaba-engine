@@ -73,6 +73,9 @@ class Post(Model):
     closed = BooleanField(default=False)
     pinned = BooleanField(default=False)
     replylist = CharField(default="[]")
+    # Add tripcodes
+    trip = CharField(null=True)
+    sec_trip = CharField(null=True)
 
     class Meta:
         database = db
