@@ -18,7 +18,7 @@
     <script src="{{basename}}/static/js/styles.js"></script>
     % if defined('board_name'):
       <script src="{{basename}}/static/js/captcha.js"></script>
-      <script src="{{basename}}/static/js/hide-post.js"></script>
+      <script src="{{basename}}/static/js/hide-post-v1.js"></script>
       <script src="{{basename}}/static/js/youtube.js"></script>
       <script src="{{basename}}/static/js/quick-reply.js"></script>
       <script src="{{basename}}/static/js/expand-images.js"></script>

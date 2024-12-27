@@ -1,8 +1,8 @@
 function expand_images(){
+  console.log("Clicked thread image")
+  thread_width = $(this).parents( ".thread" ).width();
 
-  thread_width = $(this).parents( ".Thread" ).width();
-
-  image_full = $(this).siblings(".Thread-meta").children(".image-data").children().attr("href");
+  image_full = $(this).siblings(".postContainer ").children(".fileText").children().attr("href");
 
   image_small = image_full.split(".")[0] + "s.jpg";
 

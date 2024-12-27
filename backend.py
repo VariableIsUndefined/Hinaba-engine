@@ -243,7 +243,7 @@ def post_thread(board_name):
     upload = request.files.get('upload')
     author_name = request.forms.get('author')
 
-    if not all([title, content]): return abort(400, "Incomplete post.")
+    if not all([content, upload]): return abort(400, "Incomplete post.")
 
     if len(content) > int(config['threads.content_max_length']):
             return abort(400, "The content exeeds the maximum length.")
@@ -414,7 +414,7 @@ def delete_post(board_name):
 
     board = Board.get(Board.name == board_name)
     form = dict(request.forms)
-
+    
     if bool(form.get('report')):
         reason = form.get('report')
         report_reasons = loads(config['reports.reasons'])
