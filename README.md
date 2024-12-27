@@ -11,7 +11,7 @@
 - Youtube embeds
 - Captcha
 - Mobile responsive design (through CSS media queries)
-- Tripcodes (unsecured only, for now)
+- Tripcodes (secured, and non-secured)
 - Mods are able to see poster's IP
 
 ## TODO:
