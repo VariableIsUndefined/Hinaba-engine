@@ -55,14 +55,13 @@
 
   <hr>
 
-  <form name="delform" id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
   <div class="board">
+    <form name="delform" id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
     % for thread in threads:
     % include('thread', thread=thread, board_name=board_name, board=board)
     <hr>
     % end
   </div>
-  </form>
 
   <footer>
   % include('pagination', current_page=current_page, board_name=board_name)

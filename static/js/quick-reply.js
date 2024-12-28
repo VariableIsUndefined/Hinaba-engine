@@ -32,6 +32,7 @@ function window_reply(board_name, thread_refnum, post_refnum){
 
 function open_window()
 {
+  console.log("open_window")
   var basename = document.URL.split("/").slice(3, 4);
   var board_name = document.URL.split("/").slice(4, 5);
   if (board_name == "")
