@@ -1,20 +1,15 @@
 function expand_images(){
-  console.log("Clicked thread image")
   thread_width = $(this).parents( ".thread" ).width();
-
-  image_full = $(this).siblings(".postContainer ").children(".fileText").children().attr("href");
+  image_full = $(this).parent().parent().find(".fileText").children().attr("href");
 
   image_small = image_full.split(".")[0] + "s.jpg";
 
   if ($(this).attr("src") == image_small){
-
     $(this).attr("src", image_full);
     $(this).addClass("full-image");
     $(this).css("max-width", thread_width / 2);
-
   } 
   else {
-
     $(this).attr("src", image_small);
     $(this).removeClass("full-image");
     $(this).css("max-width", "");
@@ -24,9 +19,9 @@ function expand_images(){
 }
 
 function expand_image_reply(){
-  thread_width = $(this).parents( ".Respuesta-cuerpo" ).width();
+  thread_width = $(this).parents( ".thread" ).width();
 
-  image_full = $(this).siblings(".Reply-meta").children("a").attr("href");
+  image_full = $(this).parent().parent().find(".fileText").children("a").attr("href");
 
   image_small = image_full.split(".")[0] + "s.jpg";
 
@@ -50,7 +45,7 @@ function expand_image_reply(){
 
 $( document ).ready(function() {
 
-  $("#container").on("click", ".Thread-image", expand_images)
-  $("#container").on("click", ".Reply-image", expand_image_reply)
+  $("#board").off("click").on("click", ".Thread-image", expand_images)
+  $("#board").on("click", ".Reply-image", expand_image_reply)
 
 });
