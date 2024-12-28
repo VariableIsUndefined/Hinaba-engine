@@ -1,4 +1,4 @@
-<div class="pagelist desktop">
+<div class="pagelist">
   <div class="pages">
     % if current_page != 1:
     % if current_page - 1 == 1:

@@ -43,13 +43,12 @@
 
   <hr>
 
-  <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
   <div id="board">
     <div style="clear:both;"></div>
+    <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
     % include('thread', thread=thread)	
   </div>
   <hr>
-  </form>
 
   <footer>
   % include('bottom')

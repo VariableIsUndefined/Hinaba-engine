@@ -21,7 +21,7 @@
 
           ({{image_size(thread.image)}})
         </div>
-        <a class="fileThumb">
+        <a class="fileThumb" target="_blank">
           % if is_video(thread.filename):
             <video width="250" height="250" class="Thread-video">
             <source src="{{basename}}/{{thread.image}}" type="video/{{thread.image[-3:]}}">
@@ -32,7 +32,7 @@
           % end
         </a>
       </div>
-      <div class="postInfo">
+      <div class="postInfo desktop">
         <input type="checkbox" name="{{thread.refnum}}" value="delete">
         <span class="subject">{{thread.title}}</span>
 
