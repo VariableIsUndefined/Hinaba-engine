@@ -7,45 +7,44 @@ function show_preview(){
 
     elmnt = this;
 
-    $(this).after('<div class="Reply-floating"><span style="text-align:center;">[...]</span></div>');
+    $(this).after('<div class="postPreview"><span style="text-align:center;">[...]</span></div>');
 
     jQuery.ajax({
       url: href,
       method: 'GET',
       success: function(data){
         if (is_thread){
-          var preview = $(data).find("#"+id).children(".Respuesta-cuerpo");
-          preview.find(".hide-reply").detach();
-          preview.find(".gsearch").detach();
+          preview = $(data).find("#" + id).find(".postMessage");
+          preview.find(".hide-reply, .gsearch").detach();
           var thread = preview.html().replace(/\[\]/g, "");
           preview = markdown_parser(thread).autoLink();
         }
         else
         {
-          var preview = $(data).find("#"+id)
-          preview.children(".Replies").detach()
-          ti = preview.children(".Thread-info")
-          ti.css("margin", 0)
-          preview.children(".Thread-info").detach()
-          preview.children(".Thread-meta").before(ti)
-          preview.find("button").detach()
-          preview.find(".hide-thread").detach()
-          preview.find(".gsearch").detach()
-
+          preview = $(data).find("#" + id);
+          preview.find(".Reply-list, .postInfo .fileThumb").detach();
+  
+          var postInfo = preview.find(".postInfo");
+          postInfo.css("margin", 0);
+          preview.find(".postMessage").before(postInfo);
+          preview.find("button, .hide-thread, .gsearch").detach();
+  
           var thread = preview.html().replace(/\[\]/g, "");
           preview = thread;
         }
-        $(elmnt).siblings(".Reply-floating").html(preview);
+        $(elmnt).siblings(".postPreview").html(preview);
       }
     });
 }
 
 $( document ).ready(function(){
 
-  $("#container").on("mouseenter", ".reference", show_preview)
+  // Подключаем событие наведения мыши на ссылки с классом .reference
+  $("#container").on("mouseenter", ".reference", show_preview);
 
-  $("#container").on("mouseleave", ".reference", function(){
-    $(this).siblings(".Reply-floating").detach()
+  // Удаляем превью при выходе мыши
+  $("#container").on("mouseleave", ".reference", function() {
+    $(this).siblings(".postPreview").detach();
   });
 
 });

@@ -4,7 +4,7 @@
 <div class="thread" id="{{thread.refnum}}">
   <div class="postContainer opContainer">
     <div class="post op">
-      [<span id="unhidethread#{{thread.id}}" title="Hide thread">=</span>]
+      [<span id="hide-thread" title="Hide thread">=</span>]
       <div class="file">
         <div class="fileText">File:
           <a href="{{basename}}/{{thread.image}}" title="{{thread.filename}}">
