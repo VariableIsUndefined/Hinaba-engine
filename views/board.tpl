@@ -1,5 +1,5 @@
 % rebase('base', title=f"/{board_name}/ - {board_title}")
-<body class="is_index board_a yotsuba_new ws">
+<body class="is_index board_{{board_name}} yotsuba_new ws">
   <span id="id_css"></span>
   <div class="boardBanner">
     <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>
@@ -62,6 +62,7 @@
     <hr>
     % end
   </div>
+  </form>
 
   <footer>
   % include('pagination', current_page=current_page, board_name=board_name)

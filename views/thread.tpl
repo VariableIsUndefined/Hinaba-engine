@@ -62,7 +62,10 @@
         % end 
 
         <span class="dateTime">{{thread.date}}</span>
-        <span class="postNum">No. <span class="dopen">{{thread.refnum}}</span></span>
+        <span class="postNum">
+          <a href="{{basename}}/{{board_name}}/thread/{{thread.id}}">No.</a>
+          <span class="dopen">{{thread.refnum}}</span>
+        </span>
 
         % if thread.pinned:
           <img class="pin" src="{{basename}}/static/img/sticky.gif"></img>
@@ -93,6 +96,7 @@
   % if not is_detail and query.count() > 4:
     <span class="load-replies btn">Load {{query.count() - 4}} replies</span>
   % end
+
   % for reply in replies:
   % include('reply', reply=reply)
   % end

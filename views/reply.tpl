@@ -2,6 +2,7 @@
 % from json import loads
 % from models import Post
 <div id="{{reply.refnum}}" class="postContainer replyContainer">
+  <div class="sideArrows">&gt;&gt;</div>
   <div class="post reply">
     <div class="postInfo">
       <input type="checkbox" name="{{reply.refnum}}" value="delete">
@@ -75,8 +76,9 @@
     <blockquote class="postMessage">
       % include('thread_text', thread=reply)
     </blockquote>
-
     <div style="clear:both;"></div>
+
+    <div>
       % replylist = loads(reply.replylist)
       % if replylist:
         <div class="Reply-list">
@@ -87,6 +89,6 @@
         </div>
       % end
     </div>
-    
+
   </div>
 </div>

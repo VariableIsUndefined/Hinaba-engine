@@ -1,5 +1,6 @@
 
 function window_reply(board_name, thread_refnum, post_refnum){
+  console.log(board_name, thread_refnum)
   var maxlength = $(document).find("#texta1").attr("maxlength");
   var maxsize = $(document).find("#max-size").text()
   var chars = post_refnum.length + 3
@@ -7,7 +8,7 @@ function window_reply(board_name, thread_refnum, post_refnum){
   $("#quickReply").remove();
 
   $("body").append(
-    '<div id="quickReply" class="extPanel reply" data-trackpos="QR-position"> <div id="qrHeader" class="drag postblock">Reply to thread #' + thread_refnum +
+    '<div id="quickReply" class="extPanel reply" data-trackpos="QR-position"> <div id="qrHeader" class="drag postblock">Reply to thread #' + post_refnum +
     '<span class="dclose">X</span></div> <form name="qrPost" method="POST" action="/' + board_name +
     '/' + thread_refnum + '" enctype="multipart/form-data"> <div id="qrForm"> <table> <tbody> <tr> <td>Name</td> <td> ' +
     '<input type="text" name="author"> </td> </tr> <tr> <td>Comment</td> <td><textarea maxlength="' + maxlength +
@@ -39,7 +40,8 @@ function open_window()
     board_name = basename +"/"+ board_name
 
   var thread_refnum = $(this).parents(".thread").attr("id")
-  var post_refnum = $(this).text()
+  var post_refnum = $(this).attr("id")
+  print(post_refnum)
 
   if (Boolean($("#quickReply").length))
   {
