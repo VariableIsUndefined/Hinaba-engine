@@ -25,8 +25,7 @@
 - Live threads update
 - Janitors/Mods actions logging
 - More text formatting
-- Updated design
-- Error 404 page
+- Capcodes
 
 ## Guide
 1. Clone the repository and access the folder:

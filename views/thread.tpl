@@ -35,8 +35,20 @@
       <div class="postInfo">
         <input type="checkbox" name="{{thread.refnum}}" value="delete">
         <span class="subject">{{thread.title}}</span>
-        <span class="nameBlock">
+
+        % if f':{board_name}:' in current_user.mod:
+        % name_class = "nameBlock capcodeMod"
+        % else:
+        % name_class = "nameBlock"
+        % end 
+        <span class="{{name_class}}">
           <span class="name">{{thread.author_name}}</span>
+
+          % if f':{board_name}:' in thread.author.mod:
+            <strong class="capcode hand id_mod" title="Highlight posts by Moderators">## Mod</strong>
+            <img src="{{basename}}/static/img/modicon.gif" alt="Mod Icon" title="This user is a PyChan Moderator." style="margin-bottom: -3px;">
+          % end
+
           % if thread.trip:
           <span class="postertrip">!{{thread.trip}}</span>
           % end
@@ -46,12 +58,8 @@
         </span>
 
         % if f':{board_name}:' in current_user.mod:
-        (IP: {{ thread.author.ip }})
+          (IP: {{ thread.author.ip }})
         % end 
-
-        % if f':{board_name}:' in thread.author.mod:
-          <span class="role">Mod</span>
-        % end
 
         <span class="dateTime">{{thread.date}}</span>
         <span class="postNum">No. <span class="dopen">{{thread.refnum}}</span></span>

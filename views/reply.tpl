@@ -5,8 +5,19 @@
   <div class="post reply">
     <div class="postInfo">
       <input type="checkbox" name="{{reply.refnum}}" value="delete">
-      <span class="nameBlock">
+      % if f':{board_name}:' in current_user.mod:
+      % name_class = "nameBlock capcodeMod"
+      % else:
+      % name_class = "nameBlock"
+      % end 
+      <span class="{{name_class}}">
         <span class="name">{{reply.author_name}}</span>
+
+        % if f':{board_name}:' in thread.author.mod:
+          <strong class="capcode hand id_mod" title="Highlight posts by Moderators">## Mod</strong>
+          <img src="{{basename}}/static/img/modicon.gif" alt="Mod Icon" title="This user is a PyChan Moderator." style="margin-bottom: -3px;">
+        % end
+
         % if reply.trip:
         <span class="postertrip">!{{reply.trip}}</span>
         % end
