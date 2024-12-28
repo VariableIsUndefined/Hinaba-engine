@@ -610,9 +610,9 @@ def thread_close(board_name, refnum):
 
     return redirect(f'{basename}/{board_name}/')
 
-@error(404)
-def error404(error):
-    return template("error.tpl", basename=basename)
+# @error(404)
+# def error404(error):
+#     return template("error.tpl", basename=basename)
 
 if __name__ == '__main__':
 

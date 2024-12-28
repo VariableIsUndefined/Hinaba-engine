@@ -1,17 +1,32 @@
 
-function window_reply(button, board_name, thread_refnum, post_refnum){
-
+function window_reply(board_name, thread_refnum, post_refnum){
   var maxlength = $(document).find("#texta1").attr("maxlength");
   var maxsize = $(document).find("#max-size").text()
   var chars = post_refnum.length + 3
 
-  $(button).parents(".thread").before('<div id="reply-window"> <div id="window-header">Reply to thread #'+thread_refnum+'<span class="dclose">X</span></div> <form method="POST" action="/'+board_name+'/thread/'+thread_refnum+'" enctype="multipart/form-data"> <table> <tbody> <tr> <th>Name</th> <td> <input type="text" name="author"> </td> </tr> <tr> <th>Comment</th> <td><textarea maxlength="'+maxlength+'" id="texta2" rows="6" name="content" required>>>'+post_refnum+'\n</textarea><br><small style="opacity:.5;">Max message length: <span id="count2">'+chars+'</span>/'+maxlength+'</small></td> </tr><tr><th>File</th><td><small>'+maxsize+'</small><br><input type="file" name="upload"> <input type="submit" value="Reply"></td> </tr> </tbody> </table> </form> </div>')
+  $("#quickReply").remove();
 
-  window_width = $("#reply-window").width();
-  $("#reply-window").css("left", $(window).width() - window_width - 8);
-  $("#reply-window").css("top", ($(window).height() / 2) - ($(window).height() / 4));
-  $("#reply-window").attr("for", thread_refnum)
+  $("body").append(
+    '<div id="quickReply" class="extPanel reply" data-trackpos="QR-position"> <div id="qrHeader" class="drag postblock">Reply to thread #' + thread_refnum +
+    '<span class="dclose">X</span></div> <form name="qrPost" method="POST" action="/' + board_name +
+    '/' + thread_refnum + '" enctype="multipart/form-data"> <div id="qrForm"> <table> <tbody> <tr> <td>Name</td> <td> ' +
+    '<input type="text" name="author"> </td> </tr> <tr> <td>Comment</td> <td><textarea maxlength="' + maxlength +
+    '" id="texta2" rows="6" name="content" required>>>' + post_refnum +
+    '\n</textarea><br><small style="opacity:.5;">Max message length: <span id="count2">' +
+    chars + '</span>/' + maxlength +
+    '</small></td> </tr><tr><td>File</td><td><small>' + maxsize +
+    '</small><br><input type="file" name="upload"> <input type="submit" value="Reply"></td> </tr> </tbody> </table> </div> </form> </div>'
+  );
 
+  var window_width = $("#quickReply").width();
+
+  $("#quickReply").css({
+    "position": "absolute",
+    "left": ($(window).width() - window_width - 8) + "px",
+    "top": ($(window).height() / 2 - $(window).height() / 4) + "px"
+  });
+
+  $("#quickReply").attr("for", thread_refnum)
 }
 
 function open_window()
@@ -22,36 +37,37 @@ function open_window()
     board_name = basename
   else
     board_name = basename +"/"+ board_name
+
   var thread_refnum = $(this).parents(".thread").attr("id")
   var post_refnum = $(this).text()
 
-  if (Boolean($("#reply-window").length))
+  if (Boolean($("#quickReply").length))
   {
-    win = $("#reply-window")
+    var win = $("#quickReply")
     if ( win.attr("for") == thread_refnum )
     {
-      a = win.find("textarea").val() + ">>" + post_refnum + "\n";
+      var a = win.find("textarea").val() + ">>" + post_refnum + "\n";
       win.find("textarea").val(a);
       win.find("#count2").text(win.find("textarea").val().length);
       win.find("textarea").focus();
     }
     else {
-      $("#reply-window").detach()
-      window_reply(this, board_name, thread_refnum, post_refnum)
+      $("#quickReply").remove()
+      window_reply(board_name, thread_refnum, post_refnum)
     }
   }
   else {
-    window_reply(this, board_name, thread_refnum, post_refnum)
+    window_reply(board_name, thread_refnum, post_refnum)
   }
 
   // Make the DIV element draggable:
-  dragElement(document.getElementById("reply-window"));
+  dragElement(document.getElementById("quickReply"));
 
   function dragElement(elmnt) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById("window-header")) {
+    if (document.getElementById("qrHeader")) {
       // if present, the header is where you move the DIV from:
-      document.getElementById("window-header").onmousedown = dragMouseDown;
+      document.getElementById("qrHeader").onmousedown = dragMouseDown;
     } else {
       // otherwise, move the DIV from anywhere inside the DIV:
       elmnt.onmousedown = dragMouseDown;
@@ -99,11 +115,12 @@ function open_window()
 }
 
 $( document ).ready(function() {
+
   console.log("Quick reply loaded")
-  $("#container").on("click", ".dclose", function(){
-    $("#reply-window").detach()
+  $("body").on("click", ".dclose", function() {
+    $("#quickReply").remove();
   });
 
-  $("#container").on("click", ".dopen", open_window)
+  $("#container").on("click", ".dopen", open_window);
 
 })
