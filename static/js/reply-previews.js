@@ -28,6 +28,7 @@ function show_preview(){
           preview = $(data).find("#" + id).find(".post");
           preview.find(".hide-reply").detach();
           preview.find(".gsearch").detach();
+          preview.find(".sideArrows").detach();
           var thread = preview.html().replace(/\[\]/g, "");
           preview = markdown_parser(thread).autoLink();
         }
@@ -53,7 +54,7 @@ function show_preview(){
 }
 
 $( document ).ready(function(){
-
+  console.log("Reply preview loaded")
   $("#board").on("mouseenter", ".reference", show_preview);
 
   $("#board").on("mouseleave", ".reference", function() {

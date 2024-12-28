@@ -8,7 +8,6 @@
     % end
   </div>
   <hr class="abovePostForm">
-  <div style="position:relative"></div>
   <form class="Formulario" method="POST" action="{{basename}}/{{board_name}}/" enctype="multipart/form-data">
     <table class="postForm" id="postForm" style="display: table;">
       <tbody>
@@ -54,14 +53,16 @@
   </div>
 
   <hr>
-
-  <div class="board">
-    <form name="delform" id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
+  
+  <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
+  <div id="board">
+    <div style="clear:both;"></div>
     % for thread in threads:
     % include('thread', thread=thread, board_name=board_name, board=board)
     <hr>
     % end
   </div>
+  </form>
 
   <footer>
   % include('pagination', current_page=current_page, board_name=board_name)

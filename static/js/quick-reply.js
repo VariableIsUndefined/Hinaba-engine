@@ -1,6 +1,5 @@
 
 function window_reply(board_name, thread_refnum, post_refnum){
-  console.log(board_name, thread_refnum)
   var maxlength = $(document).find("#texta1").attr("maxlength");
   var maxsize = $(document).find("#max-size").text()
   var chars = post_refnum.length + 3
@@ -32,7 +31,6 @@ function window_reply(board_name, thread_refnum, post_refnum){
 
 function open_window()
 {
-  console.log("open_window")
   var basename = document.URL.split("/").slice(3, 4);
   var board_name = document.URL.split("/").slice(4, 5);
   if (board_name == "")
@@ -40,9 +38,8 @@ function open_window()
   else
     board_name = basename +"/"+ board_name
 
-  var thread_refnum = $(this).parents(".thread").attr("id")
-  var post_refnum = $(this).attr("id")
-  print(post_refnum)
+  var thread_refnum = $(this).parents(".thread")
+  var post_refnum = $(this).text()
 
   if (Boolean($("#quickReply").length))
   {
