@@ -54,9 +54,9 @@ function show_preview(){
 
 $( document ).ready(function(){
 
-  $("#container").on("mouseenter", ".reference", show_preview);
+  $("#board").on("mouseenter", ".reference", show_preview);
 
-  $("#container").on("mouseleave", ".reference", function() {
+  $("#board").on("mouseleave", ".reference", function() {
     $("#quote-preview").remove();
   });
 

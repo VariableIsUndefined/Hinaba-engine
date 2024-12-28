@@ -123,6 +123,6 @@ $( document ).ready(function() {
     $("#quickReply").remove();
   });
 
-  $("#container").on("click", ".dopen", open_window);
+  $("#board").on("click", ".dopen", open_window);
 
 })
