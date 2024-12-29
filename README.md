@@ -1,5 +1,6 @@
 # PyChan - Imageboard Engine made with Python
 ![Screenshot](image.png)
+![Screenshot](catalog.png)
 
 ## Features
 - Simple markdown: bold (**), italic (*) and underline (__)
@@ -16,7 +17,6 @@
 
 ## TODO:
 - Threads archieve
-- Screen warning for NSFW boards
 - Roles: Janitor, Moderator, Administrator
 - Thread searching
 - Oekaki (drawing in browser)

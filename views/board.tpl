@@ -1,4 +1,9 @@
 % rebase('base', title=f"/{board_name}/ - {board_title}")
+
+<head>
+  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+</head>
+
 <body class="is_index board_{{board_name}} yotsuba_new ws">
   <span id="id_css"></span>
   <div class="boardBanner">
@@ -8,6 +13,7 @@
     % end
   </div>
   <hr class="abovePostForm">
+
   <form class="Formulario" method="POST" action="{{basename}}/{{board_name}}/" enctype="multipart/form-data">
     <table class="postForm" id="postForm" style="display: table;">
       <tbody>
@@ -49,7 +55,7 @@
   <hr>
 
   <div id="ctrl-top" class="desktop">
-  [<a class="{{basename}}/{{board_name}}/catalog">Catalog</a>]
+  [<a href="{{basename}}/{{board_name}}/catalog">Catalog</a>]
   </div>
 
   <hr>
@@ -58,12 +64,12 @@
     <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
     % for thread in threads:
     % include('thread', thread=thread, board_name=board_name, board=board)
+    <div style="clear:both;"></div>
+    <hr>
     % end
   </div>
 
   <div style="clear:both;"></div>
-
-  <hr>
 
   % include('pagination', current_page=current_page, board_name=board_name)
   % include('bottom')

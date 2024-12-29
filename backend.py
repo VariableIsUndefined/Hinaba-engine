@@ -342,7 +342,7 @@ def post_reply(board_name, refnum):
             short_content = '\n'.join(content.split('\n')[:10])
 
     upload = request.files.get('upload')
-    
+        
     trip_info = generate_trip(author_name)
     trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
     
@@ -610,9 +610,9 @@ def thread_close(board_name, refnum):
 
     return redirect(f'{basename}/{board_name}/')
 
-# @error(404)
-# def error404(error):
-#     return template("error.tpl", basename=basename)
+@error(404)
+def error404(error):
+    return template("error.tpl", basename=basename)
 
 if __name__ == '__main__':
 

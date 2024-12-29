@@ -1,6 +1,10 @@
 % rebase('base', board_name=board_name, title=thread.title)
 % from utils import image_size
 
+<head>
+  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+</head>
+
 <body class="is_index board_{{board_name}} yotsuba_new ws">
   <div class="boardBanner">
     % if thread.title:

@@ -31,10 +31,6 @@
       (IP: {{ thread.author.ip }})
       % end 
 
-      % if f':{board_name}:' in reply.author.mod:
-        <span class="role">Mod</span>
-      % end
-
       <span class="dateTime">{{reply.date}}</span>
 
       <span class="postNum">

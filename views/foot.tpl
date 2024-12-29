@@ -8,5 +8,5 @@
 <div class="id="footer-links"">
     <a href="mailto:{{config['app.contact']}}">Contact</a>
     |
-    <a href="{{basename}}/">{{config['app.host']}}</a> &copy; 2020
+    <a href="{{basename}}/">{{config['app.host']}}</a> &copy; 2024
 </div>

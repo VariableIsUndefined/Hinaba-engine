@@ -391,7 +391,7 @@ html {
   }
   
   body {
-    background: #ffe url('/image/fp/fade.png') top repeat-x;
+    background: #ffe url('/static/img/fade.png') top repeat-x;
     color: #800;
   }
   
