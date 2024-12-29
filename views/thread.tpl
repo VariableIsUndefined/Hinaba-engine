@@ -89,6 +89,7 @@
         % include('thread_text', board_name=board_name, board=board)
       </blockquote>
     </div>
+
   </div>
 
   % query = board.posts.where(Post.replyrefnum == thread.refnum).order_by(Post.refnum.asc())

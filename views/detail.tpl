@@ -44,13 +44,23 @@
   <hr>
 
   <div id="board">
-    <div style="clear:both;"></div>
     <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
     % include('thread', thread=thread)	
   </div>
+
+  <div style="clear:both;"></div>
+   
   <hr>
 
-  <footer>
   % include('bottom')
-  </footer>
+  
+  <div style="clear:both;"></div>
+  
+  % include('menu')
+
+  <div style="clear:both;"></div>
+
+  <div id="absbot" class="absBotText">
+  % include('foot')
+  </div>
 </body>

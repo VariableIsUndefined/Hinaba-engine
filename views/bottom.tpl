@@ -3,6 +3,7 @@
 % config = ConfigDict()
 % config.load_config('imageboard.conf')
 % report_reasons = loads(config['reports.reasons'])
+
 <div class="bottomCtrl">
   <span class="deleteform">
     Delete Post: <input type="submit" value="Delete"></td>
@@ -17,7 +18,3 @@
     <input type="submit" value="Report">
   </span>
 </div>
-
-<div style="clear:both;"></div>
-% include('menu')
-% include('foot')

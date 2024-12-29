@@ -55,17 +55,26 @@
   <hr>
   
   <div id="board">
-    <div style="clear:both;"></div>
     <form id="delform" action="{{basename}}/{{board_name}}/delete" method="POST">
     % for thread in threads:
     % include('thread', thread=thread, board_name=board_name, board=board)
     % end
   </div>
 
+  <div style="clear:both;"></div>
+
   <hr>
 
-  <footer>
   % include('pagination', current_page=current_page, board_name=board_name)
   % include('bottom')
-  </footer>
+  
+  <div style="clear:both;"></div>
+  
+  % include('menu')
+
+  <div style="clear:both;"></div>
+
+  <div id="absbot" class="absBotText">
+  % include('foot')
+  </div>
 </body>
