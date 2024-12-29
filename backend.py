@@ -247,7 +247,7 @@ def post_thread(board_name):
 
     if len(content) > int(config['threads.content_max_length']):
             return abort(400, "The content exeeds the maximum length.")
-
+        
     trip_info = generate_trip(author_name)
     trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
     
@@ -255,7 +255,7 @@ def post_thread(board_name):
         author_name = trip_info["author_name"]
     else:
         author_name = "Anonymous"
-    
+        
     author = current_user
     refnum = board.lastrefnum
     save_path = file_validation(board_name, refnum, upload)
