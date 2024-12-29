@@ -240,6 +240,8 @@ def post_thread(board_name):
 
     title = request.forms.get('title')
     content = request.forms.get('content')
+    email = request.forms.get('email')
+
     upload = request.files.get('upload')
     author_name = request.forms.get('author')
 
@@ -283,6 +285,7 @@ def post_thread(board_name):
         "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"),
         "trip": trip if trip != '' else None,
         "sec_trip": sec_trip if sec_trip != '' else None,
+        "email": email if email else None,
     }
 
     thread = Post(**data)
@@ -327,7 +330,8 @@ def post_reply(board_name, refnum):
 
     content = request.forms.get('content')
     author_name = request.forms.get('author')
-
+    email = request.forms.get('email')
+    
     if not bool(content): return redirect(f'{basename}/{board_name}/')
 
     if len(content) > int(config['threads.content_max_length']):
@@ -378,6 +382,7 @@ def post_reply(board_name, refnum):
         "date": datetime.now(UTC).strftime("%m/%d/%y (%a) %H:%M:%S"),
         "trip": trip if trip != '' else None,
         "sec_trip": sec_trip if sec_trip != '' else None,
+        "email": email if email else None,
     }
 
     reply = Post(**data)
@@ -397,8 +402,10 @@ def post_reply(board_name, refnum):
                         thread_ref.save()
                 except: pass
 
-    thread.bumped_at = datetime.now().replace(microsecond=0)
-    thread.save()
+    #sage: if "email" field is a sage, then thread won't get bumped
+    if email != "sage":
+        thread.bumped_at = datetime.now().replace(microsecond=0)
+        thread.save()
 
     board.lastrefnum += 1
     board.save()

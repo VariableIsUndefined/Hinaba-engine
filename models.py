@@ -66,6 +66,7 @@ class Post(Model):
     bumped_at = DateTimeField(null=True, default=datetime.datetime.now)
     filename = CharField()
     image = CharField()
+    email = TextField(null=True)
     title = CharField(null=True)
     content = TextField()
     short_content = TextField()

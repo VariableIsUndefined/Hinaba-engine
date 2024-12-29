@@ -24,6 +24,13 @@
           </td>
         </tr>
 
+        <tr data-type="Email">
+          <td>Email</td>
+          <td>
+            <input name="email" type="text" tabindex="2">
+          </td>
+        </tr>
+
         <tr data-type="Title">
           <td>Title</td>
           <td>

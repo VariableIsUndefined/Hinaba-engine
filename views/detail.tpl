@@ -26,6 +26,12 @@
             <input type="text" name="author">
           </td>
         </tr>
+        <tr data-type="Email">
+          <td>Email</td>
+          <td>
+            <input name="email" type="text" tabindex="2">
+          </td>
+        </tr>
         <tr data-type="Comment">
           <td>Comment</td>
           <td><textarea maxlength="{{maxlength}}" id="texta1" rows="6" name="content" required></textarea><br><small style="opacity:.5;">Max message length: <span id="count1">0</span>/{{maxlength}}</small></td>

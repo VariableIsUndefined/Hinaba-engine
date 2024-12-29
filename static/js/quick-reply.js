@@ -10,7 +10,8 @@ function window_reply(board_name, thread_refnum, post_refnum){
     '<div id="quickReply" class="extPanel reply" data-trackpos="QR-position"> <div id="qrHeader" class="drag postblock">Reply to thread #' + post_refnum +
     '<span class="dclose">X</span></div> <form name="qrPost" method="POST" action="/' + board_name +
     '/' + thread_refnum + '" enctype="multipart/form-data"> <div id="qrForm"> <table> <tbody> <tr> <td>Name</td> <td> ' +
-    '<input type="text" name="author"> </td> </tr> <tr> <td>Comment</td> <td><textarea maxlength="' + maxlength +
+    '<input type="text" name="author"> </td> </tr> <tr> <td>Email</td> <td> ' +
+    '<input type="text" name="email"> </td> </tr> <tr> <td>Comment</td> <td><textarea maxlength="' + maxlength +
     '" id="texta2" rows="6" name="content" required>>>' + post_refnum +
     '\n</textarea><br><small style="opacity:.5;">Max message length: <span id="count2">' +
     chars + '</span>/' + maxlength +
