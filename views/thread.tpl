@@ -4,7 +4,9 @@
 <div class="thread" id="{{thread.refnum}}">
   <div class="postContainer opContainer">
     <div class="post op">
-      [<span id="hide-thread" title="Hide thread">=</span>]
+      <span id="hide-thread" title="Hide thread">
+        <img alt="H" class="extButton threadHideButton" data-cmd="hide" src="{{basename}}/static/img/post_expand_minus.png" title="Hide thread">
+      </span>
       <div class="file">
         <div class="fileText">File:
           <a href="{{basename}}/{{thread.image}}" title="{{thread.filename}}">
