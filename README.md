@@ -34,7 +34,7 @@
 
 Downloading latest release instead of cloning repository is highly recommended.
 The current repository may be unstable.
-Use current repository at your own risk.
+Use current it at your own risk.
 
 ## Guide
 
