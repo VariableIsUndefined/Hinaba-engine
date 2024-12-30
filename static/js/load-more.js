@@ -51,8 +51,8 @@ function less_thread(){
 }
 
 $( document ).ready(function() {
-  $("#container").on("click", ".full-thread", full_thread);
-  $("#container").on("click", ".less-thread", less_thread);
-  $("#container").on("click", ".load-replies", load_replies);
-  $("#container").on("click", ".less-replies", less_replies);
+  $("#board").on("click", ".full-thread", full_thread);
+  $("#board").on("click", ".less-thread", less_thread);
+  $("#board").on("click", ".load-replies", load_replies);
+  $("#board").on("click", ".less-replies", less_replies);
 });
