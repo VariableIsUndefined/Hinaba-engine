@@ -21,6 +21,7 @@
       <script src="{{basename}}/static/js/quick-reply.js"></script>
       <script src="{{basename}}/static/js/expand-images.js"></script>
       <script src="{{basename}}/static/js/reply-previews.js"></script>
+      <script src="{{basename}}/static/js/hide-post.js"></script>
       <script src="{{basename}}/static/js/load-more.js"></script>
       <script src="{{basename}}/static/js/videos.js"></script>
       <script src="{{basename}}/static/js/content-length.js"></script>

@@ -34,7 +34,7 @@
           % end
         </a>
       </div>
-      <div class="postInfo desktop">
+      <div class="postInfo">
         <input type="checkbox" name="{{thread.refnum}}" value="delete">
         <span class="subject">{{thread.title}}</span>
 
