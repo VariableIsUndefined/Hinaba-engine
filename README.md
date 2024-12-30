@@ -30,7 +30,14 @@
 - Janitors/Mods actions logging
 - More text formatting
 
+## Warning
+
+Downloading latest release instead of cloning repository is highly recommended.
+The current repository may be unstable.
+Use current repository at your own risk.
+
 ## Guide
+
 1. Clone the repository and access the folder:
 
 `$ git clone https://github.com/VariableIsUndefined/PyChan-engine.git`
