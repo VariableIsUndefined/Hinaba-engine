@@ -27,7 +27,7 @@
           </td>
         </tr>
 
-        % if f':{board_name}:' in current_user.mod and  current_user.can_capcode:
+        % if current_user.can_capcode:
         <tr data-type="Capcode">
           <td>Capcode</td>
           <td>
