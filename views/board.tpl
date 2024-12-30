@@ -24,6 +24,15 @@
           </td>
         </tr>
 
+        % if f':{board_name}:' in current_user.mod and  current_user.can_capcode:
+        <tr data-type="Capcode">
+          <td>Capcode</td>
+          <td>
+            <input type="checkbox" name="capcode" value="on" checked="checked" size="35"> ({{current_user.capcode}})
+          </td>
+        </tr>
+        % end
+
         <tr data-type="Email">
           <td>Email</td>
           <td>

@@ -8,6 +8,8 @@
     <option value="{{board.name}}">{{board.name}}</option>
     % end
   </select>
+  <input type="checkbox" name="can_capcode" size="35">
+  <input type="text" name="capcode">
 	<input type="submit" value="Add">
 </form>
 <table class="Reports" id="mods">
@@ -16,6 +18,8 @@
       <th>IP</th>
       <td>Mod</td>
       <td>Role</td>
+      <td>Can Capcode</td>
+      <td>Capcode</td>
       <td></td>
     </tr>
   </thead>  
@@ -32,6 +36,8 @@
               % end
             </select>
 	          <input type="text" name="ip" value="{{mod.ip}}" hidden>
+            <input type="checkbox" name="can_capcode" value="{{mod.can_capcode}}" size="35">
+            <input type="text" name="capcode" value="{{mod.capcode}}">
             <input type="submit" name="rm" value="Remove">
             <input type="submit" name="add" value="Add">
             </td>

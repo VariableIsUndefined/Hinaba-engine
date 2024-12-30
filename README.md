@@ -14,8 +14,10 @@
 - Mobile responsive design (through CSS media queries)
 - Tripcodes (secured, and non-secured)
 - Mods are able to see poster's IP
-- Sage
+- Sage (Thread won't get bumped if you type "sage" in Email field)
+- Noko (You will stay at thread page if you type "noko" in email field)
 - Dice rolling
+- Capcodes (Set the capcode for user in admin panel. Use can post with/out capcode). Available capcodes: ## Verified, ## Mod, ## Admin, ## Developer, ## Manager, ## Founder
 
 ## TODO:
 - Threads archieve
@@ -27,7 +29,6 @@
 - Live threads update
 - Janitors/Mods actions logging
 - More text formatting
-- Capcodes
 
 ## Guide
 1. Clone the repository and access the folder:

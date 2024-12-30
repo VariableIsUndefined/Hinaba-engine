@@ -42,7 +42,7 @@ class Anon(Model):
     banned = BooleanField(default=False)
     mod = CharField(default="")
     can_capcode = BooleanField(default=False)
-    capcode = CharField(null=True)
+    capcode = CharField(default='')
     ban_reason = CharField(null=True)
     ban_date = DateTimeField(null=True)
 
@@ -76,6 +76,7 @@ class Post(Model):
     closed = BooleanField(default=False)
     pinned = BooleanField(default=False)
     replylist = CharField(default="[]")
+    capcode = CharField(default='')
     # Add tripcodes
     trip = CharField(null=True)
     sec_trip = CharField(null=True)

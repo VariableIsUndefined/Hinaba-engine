@@ -241,6 +241,7 @@ def post_thread(board_name):
     title = request.forms.get('title')
     content = request.forms.get('content')
     email = request.forms.get('email')
+    capcode = request.forms.get("capcode")
 
     upload = request.files.get('upload')
     author_name = request.forms.get('author')
@@ -255,8 +256,6 @@ def post_thread(board_name):
     
     if author_name:   
         author_name = trip_info["author_name"]
-    else:
-        author_name = "Anonymous"
         
     author = current_user
     refnum = board.lastrefnum
@@ -281,7 +280,7 @@ def post_thread(board_name):
     data = {
         "board": board,
         "author": author,
-        "author_name": author_name,
+        "author_name": author_name if author_name != "" else "Anonymous",
         "refnum": refnum,
         "filename": upload.filename,
         "image": save_path,
@@ -292,6 +291,7 @@ def post_thread(board_name):
         "trip": trip if trip != '' else None,
         "sec_trip": sec_trip if sec_trip != '' else None,
         "email": email if email else None,
+        "capcode": current_user.capcode if capcode == "on" else ''
     }
 
     thread = Post(**data)
@@ -337,7 +337,8 @@ def post_reply(board_name, refnum):
     content = request.forms.get('content')
     author_name = request.forms.get('author')
     email = request.forms.get('email')
-    
+    capcode = request.forms.get("capcode")
+
     if not bool(content): return redirect(f'{basename}/{board_name}/')
 
     if len(content) > int(config['threads.content_max_length']):
@@ -363,8 +364,6 @@ def post_reply(board_name, refnum):
     
     if author_name:   
         author_name = trip_info["author_name"]
-    else:
-        author_name = "Anonymous"
 
     author = current_user
     no = board.lastrefnum
@@ -378,11 +377,12 @@ def post_reply(board_name, refnum):
             save_path = file_validation(board_name, no, upload, is_reply=True)
             if save_path == 1: return redirect(f'{basename}/{board_name}/thread/{refnum}')
             filename = upload.filename
-
+    print(author_name)
+    
     data = {
         "board": board,
         "author": author,
-        "author_name": author_name,
+        "author_name": author_name if author_name != "" else "Anonymous",
         "refnum": no,
         "is_reply": True,
         "replyrefnum": refnum,
@@ -394,6 +394,7 @@ def post_reply(board_name, refnum):
         "trip": trip if trip != '' else None,
         "sec_trip": sec_trip if sec_trip != '' else None,
         "email": email if email else None,
+        "capcode": current_user.capcode if capcode == "on" else '',
     }
 
     reply = Post(**data)
@@ -421,7 +422,11 @@ def post_reply(board_name, refnum):
     board.lastrefnum += 1
     board.save()
 
-    redirect(f'{basename}/{board_name}/')
+    # noko: if you type it in email field, you wont get redirect back to board, you will stay in thread
+    if email == 'noko':
+        redirect(f'{basename}/{board_name}/thread/{refnum}')
+    else:
+        redirect(f'{basename}/{board_name}/')
 
 def remove_textual_refs(board, thread):
     for word in thread.content.split():
@@ -582,14 +587,18 @@ def add_mod():
 
     ip = request.forms.get("ip")
     board = request.forms.get("board")
-
+    can_capcode = request.forms.get("can_capcode")
+    capcode = request.forms.get("capcode")
+        
     try:
         anon = Anon.get(Anon.ip == ip)
     except:
         return abort(404, "User does not exist.")
 
     if f':{board}:' not in anon.mod: anon.mod += ":"+board+":"
-
+    anon.can_capcode = can_capcode
+    anon.capcode = capcode
+    
     anon.save()
 
     return redirect(f'{basename}/admin')
