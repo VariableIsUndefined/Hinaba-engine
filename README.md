@@ -15,6 +15,7 @@
 - Tripcodes (secured, and non-secured)
 - Mods are able to see poster's IP
 - Sage
+- Dice rolling
 
 ## TODO:
 - Threads archieve
@@ -27,7 +28,6 @@
 - Janitors/Mods actions logging
 - More text formatting
 - Capcodes
-- Dice rolling
 
 ## Guide
 1. Clone the repository and access the folder:

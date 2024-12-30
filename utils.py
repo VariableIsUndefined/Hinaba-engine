@@ -186,3 +186,36 @@ def generate_trip(name):
             info["sec_trip"] = sha
                         
     return info
+
+def dice(email):
+    # a dice func for "email" field
+    
+    if email:
+        match = re.search(r"dice[ +](\d+)[ d+](\d+)(([ +-]+?)(-?\d+))?", email)
+        if match:
+            dicetxt = "rolled "
+            dicenum = min(25, int(match.group(1)))
+            diceside = int(match.group(2))
+            diceaddexpr = match.group(3)
+            dicesign = match.group(4)
+            diceadd = int(match.group(5)) if match.group(5) else 0
+            
+            dicesum = 0
+            for i in range(dicenum):
+                dicerand = random.randint(1, diceside)
+                if i:
+                    dicetxt += ", "
+                dicetxt += str(dicerand)
+                dicesum += dicerand
+            
+            if diceaddexpr:
+                if "-" in dicesign:
+                    diceadd *= -1
+                dicetxt += (" + " if diceadd >= 0 else " - ") + str(abs(diceadd))
+                dicesum += diceadd
+            
+            dicetxt += f" = {dicesum}"
+            
+            return dicetxt
+    
+    return None

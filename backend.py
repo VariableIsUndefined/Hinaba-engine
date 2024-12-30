@@ -1,7 +1,7 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error, template)
-from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip
+from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
 from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
@@ -271,6 +271,12 @@ def post_thread(board_name):
             short_content = '\n'.join(content.split('\n')[:10])
 
     if save_path == 1: return redirect(f'{basename}/{board_name}/')
+    
+    got_dice = dice(email)
+    if got_dice:
+        content = f"{got_dice}\n" + content
+        short_content = f"{got_dice}\n" + short_content
+
 
     data = {
         "board": board,
@@ -344,6 +350,11 @@ def post_reply(board_name, refnum):
             short_content = ' '.join(content.split(' ')[:200])
         else:
             short_content = '\n'.join(content.split('\n')[:10])
+    
+    got_dice = dice(email)
+    if got_dice:
+        content = f"{got_dice}\n" + content
+        short_content = f"{got_dice}\n" + short_content
 
     upload = request.files.get('upload')
         
