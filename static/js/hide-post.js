@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".threadHideButton").forEach(button => {
     button.addEventListener("click", function () {
       const thread = this.closest(".thread");
-      console.log(thread)
       if (!thread) return;
       
       const isHidden = this.dataset.hidden === "true";
