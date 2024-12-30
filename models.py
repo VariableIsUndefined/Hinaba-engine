@@ -41,6 +41,8 @@ class Anon(Model):
     ip = IPField()
     banned = BooleanField(default=False)
     mod = CharField(default="")
+    can_capcode = BooleanField(default=False)
+    capcode = CharField(null=True)
     ban_reason = CharField(null=True)
     ban_date = DateTimeField(null=True)
 
