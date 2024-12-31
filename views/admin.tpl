@@ -1,7 +1,13 @@
 % rebase('base', title="Administration")
 % from models import Board
-<h3 class="Title">Mods</h3>
-<form class="Ban-form" action="{{basename}}/new_mod" method="POST">
+
+<head>
+  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+</head>
+
+<div class="boardBanner"><div class="boardTitle">Mods</div></div>
+
+<form class="banForm" action="{{basename}}/new_mod" method="POST">
 	<input name="ip" type="text" placeholder="ip">
   <select name="board">
     % for board in Board.select():
@@ -12,6 +18,8 @@
   <input type="text" name="capcode">
 	<input type="submit" value="Add">
 </form>
+
+
 <table class="Reports" id="mods">
   <thead>
     <tr>
@@ -36,21 +44,27 @@
               % end
             </select>
 	          <input type="text" name="ip" value="{{mod.ip}}" hidden>
-            <input type="checkbox" name="can_capcode" value="{{mod.can_capcode}}" size="35">
-            <input type="text" name="capcode" value="{{mod.capcode}}">
             <input type="submit" name="rm" value="Remove">
             <input type="submit" name="add" value="Add">
             </td>
             <td>
-            <input type="submit" name="rmall" value="Remove all">
+              <input type="checkbox" name="can_capcode" checked="{{"checked" if mod.can_capcode else ""}}" size="35">
+            </td>
+            <td>
+              <input type="text" name="capcode" value="{{mod.capcode}}">
+            </td>
+            <td>
+              <input type="submit" name="rmall" value="Remove all">
           </form>
         </td>
       </tr>
     % end
   </tbody>
 </table>
-<h3 class="Title">Boards</h3>
-<form class="Ban-form" action="{{basename}}/add_board" method="POST" enctype="multipart/form-data">
+
+<div class="boardBanner"><div class="boardTitle">Boards</div></div>
+
+<form class="banForm" action="{{basename}}/add_board" method="POST" enctype="multipart/form-data">
 	<input name="name" type="text" placeholder="board name" required>
 	<input name="title" type="text" placeholder="board title" required>
 	NSFW: <input name="nsfw" type="checkbox" placeholder="board title">
@@ -78,6 +92,7 @@
     % end
   </tbody>
 </table>
+
 <form action="{{basename}}/logout" method="POST" style="text-align: center;margin-top:10px;">
   <input type="submit" value="Log out">
 </form>

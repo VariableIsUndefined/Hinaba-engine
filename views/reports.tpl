@@ -1,6 +1,12 @@
 % rebase('base', title="Moderation")
 % from models import Post, Board
-<h3 class="Title">Reports</h3>
+
+<head>
+  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+</head>
+
+<div class="boardBanner"><div class="boardTitle">Reports</div></div>
+
 <table class="Reports" id="reports">
   <thead>
     <tr>
@@ -34,8 +40,10 @@
   % end
   </tbody>
 </table>
-<h3 class="Title">Bans</h3>
-<form class="Ban-form" action="{{basename}}/{{board_name}}/ban" method="POST">
+
+<div class="boardBanner"><div class="boardTitle">Bans</div></div>
+
+<form class="banForm" action="{{basename}}/{{board_name}}/ban" method="POST">
   <input name="user" type="text" placeholder="user">
   <select name="reason">
     <option selected disabled>Reason:</option>
