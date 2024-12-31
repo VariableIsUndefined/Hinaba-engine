@@ -3,7 +3,7 @@
 ![Screenshot](catalog.png)
 
 ## Features
-- Simple markdown: bold (**), italic (*) and underline (__)
+- Markdown: bold (**), italic (*), underline (__), spoiler (%%) and code (`)
 - Green (>) and Pink (<) text
 - Quick replies
 - Reply previews
@@ -28,7 +28,6 @@
 - Interface management
 - Live threads update
 - Janitors/Mods actions logging
-- More text formatting
 
 ## Warning
 
