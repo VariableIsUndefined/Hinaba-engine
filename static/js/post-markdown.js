@@ -16,7 +16,7 @@ function markdown(){
 
 function card_text(){
 
-  var text_thread = $( ".Card-text" ).toArray();
+  var text_thread = $( ".teaser" ).toArray();
 
   for ( i = 0; i < text_thread.length; i++) {
 

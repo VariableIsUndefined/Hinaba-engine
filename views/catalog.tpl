@@ -35,7 +35,7 @@
           </div>
 
           <div class="teaser">
-            <b>{{thread.title}}</b>
+            <b>{{thread.title}}:</b>
             {{thread.short_content}}        	
           </div>
 
