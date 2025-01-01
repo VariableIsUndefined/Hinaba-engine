@@ -376,7 +376,6 @@ def post_reply(board_name, refnum):
             save_path = file_validation(board_name, no, upload, is_reply=True)
             if save_path == 1: return redirect(f'{basename}/{board_name}/thread/{refnum}')
             filename = upload.filename
-    print(author_name)
     
     data = {
         "board": board,
