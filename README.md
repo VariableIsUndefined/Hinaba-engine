@@ -4,6 +4,7 @@
 ![Screenshot](catalog.png)
 
 ## Features
+- Customizable categories for boards
 - Markdown: bold (**), italic (*), underline (__), spoiler (%%) and code (`)
 - Green (>) and Pink (<) text
 - Quick replies
@@ -29,6 +30,7 @@
 - Interface management
 - Live threads update
 - Janitors/Mods actions logging
+- Individual configuration for every board: bump limit, max file size, max message size, oekaki, etc.
 
 ## Warning
 
