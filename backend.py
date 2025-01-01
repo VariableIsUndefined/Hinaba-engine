@@ -678,6 +678,11 @@ def del_category(category_name):
 def error404(error):
     return template("error.tpl", basename=basename)
 
+@get('/rules')
+@view('rules')
+def rules():
+    return dict(rules=config['app.rules'], basename=basename)
+
 if __name__ == '__main__':
 
     db.connect()

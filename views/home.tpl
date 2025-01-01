@@ -8,7 +8,7 @@
 <div id="doc">
   <div id="hd">
     <div id="logo-fp">
-      <a href="{{basename}}" title="Home"><img alt="4chan" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Python_logo_and_wordmark.svg/2560px-Python_logo_and_wordmark.svg.png" width="500" height="120"></a>
+      <a href="{{basename}}" title="Home"><img alt="pychan" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Python_logo_and_wordmark.svg/2560px-Python_logo_and_wordmark.svg.png" width="500" height="120"></a>
     </div>
   </div>
   <h1 class="Title">{{title}}</h1>
@@ -61,10 +61,17 @@
         </div>
       </div>
     </div>
-    
-    <div id="ft">
-      % include('foot')
+  </div>
+  <div id="ft">
+    <ul>
+      <li class="fill"></li>
+      <li class="first"><a href="/">Home</a></li>
+      <li><a href="/faq">FAQ</a></li>
+      <li><a href="/rules">Rules</a></li>
+    </ul>
+    <br class="clear-bug">
+    <div id="copyright">
+    % include('foot')
     </div>
-    
   </div>
 </div>
