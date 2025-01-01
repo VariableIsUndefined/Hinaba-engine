@@ -6,6 +6,7 @@
 </head>
 
 <body class="is_index board_{{board_name}} yotsuba_new ws">
+  % include('menu')
   <div class="boardBanner">
     % if thread.title:
       <div class="boardTitle"> {{thread.title}} </div>

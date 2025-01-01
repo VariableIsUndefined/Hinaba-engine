@@ -8,7 +8,6 @@
   <title>{{title}}</title>
   </head>
   <body>
-    % include('menu')
     {{!base}}
     <script src="{{basename}}/static/lib/jquery-3.5.1.min.js"></script>
     <script src="{{basename}}/static/lib/markdown.js"></script>

@@ -5,6 +5,8 @@
   <link rel="stylesheet" href="{{basename}}/static/css/staff_yotsubanew.css">
 </head>
 
+% include('menu')
+
 <div class="boardBanner"><div class="boardTitle">Reports</div></div>
 
 <table class="Reports" id="reports">

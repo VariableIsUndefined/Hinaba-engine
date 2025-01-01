@@ -5,6 +5,8 @@
   <link rel="stylesheet" href="{{basename}}/static/css/staff_yotsubanew.css">
 </head>
 
+% include('menu')
+
 <div class="boardBanner"><div class="boardTitle">Mods</div></div>
 
 <form class="banForm" action="{{basename}}/new_mod" method="POST">
@@ -14,8 +16,8 @@
     <option value="{{board.name}}">{{board.name}}</option>
     % end
   </select>
-  <input type="checkbox" name="can_capcode" size="35">
-  <input type="text" name="capcode">
+  Can Capcode: <input type="checkbox" name="can_capcode" size="35">
+  Capcode: <input type="text" name="capcode">
 	<input type="submit" value="Add">
 </form>
 

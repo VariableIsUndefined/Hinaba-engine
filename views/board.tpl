@@ -5,6 +5,7 @@
 </head>
 
 <body class="is_index board_{{board_name}} yotsuba_new ws">
+  % include('menu')
   <span id="id_css"></span>
   <div class="boardBanner">
     <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>

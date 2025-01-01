@@ -246,6 +246,8 @@ def post_thread(board_name):
 
     upload = request.files.get('upload')
     author_name = request.forms.get('author')
+    
+    if not author_name: author_name = "Anonymous"
 
     if not all([content, upload]): return abort(400, "Incomplete post.")
 
@@ -336,6 +338,8 @@ def post_reply(board_name, refnum):
     author_name = request.forms.get('author')
     email = request.forms.get('email')
     capcode = request.forms.get("capcode")
+    
+    if not author_name: author_name = "Anonymous"
 
     if not bool(content): return redirect(f'{basename}/{board_name}/')
 

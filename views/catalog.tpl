@@ -6,6 +6,7 @@
 </head>
 
 <body class="is_index board_{{board_name}} yotsuba_new ws">
+  % include('menu')
   <div class="boardBanner">
     <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>
     % if board.nsfw:
@@ -50,7 +51,9 @@
           </div>
 
           <div class="teaser">
+            % if thread.title:
             <b>{{thread.title}}:</b>
+            % end
             {{thread.short_content}}        	
           </div>
 

@@ -56,6 +56,7 @@
         </div>
         <div class="boxcontent">
           <div class="stat-cell"><b>Number of messages:</b> {{number_of_messages}}</div>
+          <div class="stat-cell"><b>Active boards:</b> {{Board.select().count()}}</div>
           <div class="stat-cell"><b>Active content:</b> {{get_size_format(active_content_size)}}</div>
         </div>
       </div>
