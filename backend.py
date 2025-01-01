@@ -252,10 +252,7 @@ def post_thread(board_name):
             return abort(400, "The content exeeds the maximum length.")
         
     trip_info = generate_trip(author_name)
-    trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
-    
-    if author_name:   
-        author_name = trip_info["author_name"]
+    author_name, trip, sec_trip = trip_info["author_name"], trip_info["trip"], trip_info["sec_trip"]
         
     author = current_user
     refnum = board.lastrefnum
@@ -280,7 +277,7 @@ def post_thread(board_name):
     data = {
         "board": board,
         "author": author,
-        "author_name": author_name if author_name != "" else "Anonymous",
+        "author_name": author_name,
         "refnum": refnum,
         "filename": upload.filename,
         "image": save_path,
@@ -360,10 +357,7 @@ def post_reply(board_name, refnum):
     upload = request.files.get('upload')
         
     trip_info = generate_trip(author_name)
-    trip, sec_trip = trip_info["trip"], trip_info["sec_trip"]
-    
-    if author_name:   
-        author_name = trip_info["author_name"]
+    author_name, trip, sec_trip =  trip_info["author_name"], trip_info["trip"], trip_info["sec_trip"]
 
     author = current_user
     no = board.lastrefnum
@@ -382,7 +376,7 @@ def post_reply(board_name, refnum):
     data = {
         "board": board,
         "author": author,
-        "author_name": author_name if author_name != "" else "Anonymous",
+        "author_name": author_name,
         "refnum": no,
         "is_reply": True,
         "replyrefnum": refnum,

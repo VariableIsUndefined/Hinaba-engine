@@ -1,10 +1,13 @@
 const markdownParser = (text) => {
-  const toHTML = text
-  .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>') // bold text
-  .replace(/\*(.*)\*/gim, '<i>$1</i>') // italic text
-  .replace(/\_\_(.*)\_\_/gim, '<u>$1</u>') // underlined text
-  .replace(/\%\%(.*)\%\%/gim, '<s>$1</s>') // spoiler text
-  .replace(/\`(.*)\`/gim, '<code>$1</code>') // spoiler text
+  const rules = [
+    { regex: /\*\*(.*)\*\*/gim, replacement: '<b>$1</b>' }, // bold text
+    { regex: /\*(.*)\*/gim, replacement: '<i>$1</i>' }, // italic text
+    { regex: /\_\_(.*)\_\_/gim, replacement: '<u>$1</u>' }, // underlined text
+    { regex: /\%\%(.*)\%\%/gim, replacement: '<s>$1</s>' }, // spoiler text
+    { regex: /\`(.*)\`/gim, replacement: '<code>$1</code>' }, // code text
+  ];
+
+  const toHTML = rules.reduce((acc, rule) => acc.replace(rule.regex, rule.replacement), text)
 
   return toHTML.trim()
 }
@@ -41,9 +44,7 @@ function card_text(){
 }
 
 $( document ).ready(function() {
-
   markdown();
 
   card_text();
-
 });

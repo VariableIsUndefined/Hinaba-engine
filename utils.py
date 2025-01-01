@@ -148,7 +148,7 @@ def short_msg(string):
 
 def generate_trip(name):
     info = {
-        "author_name": "",
+        "author_name": name,
         "trip": "",
         "sec_trip": "",
     }
@@ -161,7 +161,6 @@ def generate_trip(name):
     if '#' in name:
         name = name.replace("&#", "&&")
         parts = name.replace("&&", "&#").split("#", 2)
-        
         if len(parts) == 2:
             nametemp, trip = parts
             sectrip = ""
