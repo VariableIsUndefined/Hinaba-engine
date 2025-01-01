@@ -14,6 +14,21 @@
   </div>
   <hr>
   <div id="content">
+    <div id="ctrl">
+      <div id="info">
+        <span class="navLinks mobilebtn">
+          <span class="btn-wrap"><a href="./" class="button">Return</a></span>
+          <span class="btn-wrap"><a id="refresh-btn" href="./catalog" class="button">Refresh</a></span>
+        </span>
+      </div>
+      <div id="settings" class="mobilebtn">
+
+      </div>
+      <div class="clear"></div>
+    </div>
+
+    <hr>
+
     <div id="threads" class="extended-small" contextmenu="ctxmenu-main">
       % for thread in threads:
       % file_ext = thread.filename.split(".")[1]

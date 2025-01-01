@@ -13,13 +13,13 @@ function full_thread(){
 }
 
 function load_replies(){
-  var href = $(this).parent().siblings(".Thread-info").children(".btn").attr("href");
-  var container = $(this).parents(".Replies")
+  var href = $(this).parent().children(".opContainer").children(".op").children(".postInfo").children(".btn").attr("href");
+  var container = $(this).parents(".replyContainer")
   $.ajax({
     url: href,
     type: 'GET',
     success: function(data){
-      container.html('<span class="less-replies btn">Less replies</span>' + markdown_parser($(data).find(".Replies").html().replace(/\s+/g, ' ').autoLink()));
+      container.html('<span class="less-replies btn">Less replies</span>' + markdown_parser($(data).parent().parent().parent().parent().find(".replyContainer").html().replace(/\s+/g, ' ').autoLink()));
     }
   });
 }

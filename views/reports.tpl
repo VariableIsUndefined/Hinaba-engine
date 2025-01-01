@@ -2,7 +2,7 @@
 % from models import Post, Board
 
 <head>
-  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+  <link rel="stylesheet" href="{{basename}}/static/css/staff_yotsubanew.css">
 </head>
 
 <div class="boardBanner"><div class="boardTitle">Reports</div></div>
