@@ -30,9 +30,11 @@
 - Interface management
 - Live threads update
 - Janitors/Mods actions logging
-- Individual configuration for every board: bump limit, max file size, max message size, oekaki, etc.
+- Individual configuration for every board: bump limit, max file size, max message size, oekaki, rules, etc.
 
 ## Warning
+
+Imageboard style inspired by 4chan Yotsuba.
 
 Downloading latest release instead of cloning repository is highly recommended.
 The current repository may be unstable.
