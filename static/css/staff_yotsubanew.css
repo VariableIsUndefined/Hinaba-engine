@@ -83,7 +83,7 @@ background-color: rgb(246, 161, 119);
 }
 
 .Reports tr:nth-child(even) {
-	background: #ccc;
+	background: rgb(244, 205, 186);
 }
 
 .Reports td,

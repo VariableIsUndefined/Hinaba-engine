@@ -62,12 +62,48 @@
   </tbody>
 </table>
 
+<div class="boardBanner"><div class="boardTitle">Categories</div></div>
+
+<form class="banForm" action="{{basename}}/add_category" method="POST" enctype="multipart/form-data">
+	<input name="name" type="text" placeholder="category name" required>
+	<input type="submit" value="Add">
+</form>
+
+<table class="Reports">
+  <thead>
+    <tr>
+      <td>Id</td>
+      <td>Category</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    % for category in categories:
+      <tr>
+        <td>{{category.id}}</td>
+        <td>{{category.name}}</td>
+        <td>
+          <form action="{{basename}}/del_category/{{category.name}}" method="POST">	
+            <input type="submit" value="Delete"></input>
+          </form>
+        </td>
+      </tr>
+    % end
+  </tbody>
+</table>
+
 <div class="boardBanner"><div class="boardTitle">Boards</div></div>
 
 <form class="banForm" action="{{basename}}/add_board" method="POST" enctype="multipart/form-data">
 	<input name="name" type="text" placeholder="board name" required>
 	<input name="title" type="text" placeholder="board title" required>
 	NSFW: <input name="nsfw" type="checkbox" placeholder="board title">
+  <select name="category">
+    <option selected disabled>Category:</option>
+    % for category in categories:
+      <option value="{{category.name}}">{{category.name}}</option>   
+    % end
+  </select>
 	<input type="submit" value="Add">
 </form>
 <table class="Reports">
@@ -75,6 +111,7 @@
     <tr>
       <td>Board</td>
       <td>Title</td>
+      <td>Category</td>
       <td id="view-field"></td>
     </tr>
   </thead>
@@ -83,6 +120,7 @@
       <tr>
         <td>{{board.name}}</td>
         <td>{{board.title}}</td>
+        <td>{{board.category}}</td>
         <td>
           <form action="{{basename}}/del_board/{{board.name}}" method="POST">	
             <input type="submit" value="Delete"></input>

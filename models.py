@@ -52,6 +52,7 @@ class Anon(Model):
 class Board(Model):
     name = CharField()
     title = CharField()
+    category = CharField(null=False)
     nsfw = BooleanField(default=False)
     lastrefnum = IntegerField(default=1)
 
@@ -100,12 +101,11 @@ class Captcha(Model):
     class Meta:
         database = db
 
-class Stylesheet(Model):
-    title = CharField()
-    filename  = CharField()
+class Category(Model):
+    name = CharField(null=False)
     
     class Meta:
         database = db
 
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, Stylesheet])
+    db.create_tables([Report, Post, Board, Anon, Captcha, Category])

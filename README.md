@@ -1,4 +1,5 @@
 # PyChan - Imageboard Engine made with Python
+![Screenshot](home.png)
 ![Screenshot](image.png)
 ![Screenshot](catalog.png)
 

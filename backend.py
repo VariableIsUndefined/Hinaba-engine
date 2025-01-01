@@ -6,7 +6,7 @@ from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
 from waitress import serve
-from models import db, Post, Anon, Board, Report, Captcha
+from models import db, Post, Anon, Board, Report, Captcha, Category
 from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
 from random import randint
@@ -191,6 +191,7 @@ def admin_panel():
 
     return dict(boards=Board.select(), current_user=current_user,
             board_name=None, mods=Anon.select().where(Anon.mod != ""),
+            categories=Category.select(),
             basename=basename)
 
 @get('/login')
@@ -512,6 +513,7 @@ def add_board():
         return abort(403, "You are not allowed to do this.")
 
     name = request.forms.get("name").strip().lower()
+    category = request.forms.get("category")
 
     if any( char in list(punctuation + ' ') for char in name ):
         return abort(400, "Boards can't have symbols in their name.")
@@ -519,10 +521,14 @@ def add_board():
     if Board.select().where(Board.name == name).exists():
         return abort(400, "A board with this name already exists.")
 
+    if not category:
+        return abort(400, "Please select a category.")
+    
     data = {
         "name": name,
         "nsfw": bool(request.forms.get("nsfw")),
-        "title": request.forms.get("title").strip()
+        "title": request.forms.get("title").strip(),
+        "category": category,
     }
 
     board = Board(**data)
@@ -630,6 +636,40 @@ def thread_close(board_name, refnum):
     thread.save()
 
     return redirect(f'{basename}/{board_name}/')
+
+@post('/add_category')
+def add_category():
+
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    name = request.forms.get("name").strip()
+
+    if Board.select().where(Board.name == name).exists():
+        return abort(400, "A category with this name already exists.")
+
+    data = {
+        "name": name,
+    }
+
+    category = Category(**data)
+    category.save()
+
+    return redirect(f'{basename}/admin')
+
+@post('/del_category/<category_name>')
+def del_category(category_name):
+
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    category = Category.get(Category.name == category_name)
+
+    Board.update(category='').where(Board.category == category).execute()
+
+    category.delete_instance()
+
+    return redirect(f'{basename}/admin')
 
 @error(404)
 def error404(error):
