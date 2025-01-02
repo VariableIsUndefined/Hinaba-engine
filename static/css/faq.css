@@ -1,0 +1,82 @@
+ul,ol,dl {
+    margin: 1em
+}
+
+ul li {
+    list-style: disc outside
+}
+
+ol li {
+    list-style: decimal outside
+}
+
+div ul {
+    margin-left: 2em
+}
+
+li ul {
+    margin-left: 1em;
+    margin-top: 0
+}
+
+li li ul {
+    margin-bottom: .5em
+}
+
+em {
+    font-style: italic
+}
+
+strong {
+    font-weight: 700
+}
+
+.boxcontent {
+    line-height: 1.5em;
+    color: #000
+}
+
+.boxcontent>ul {
+    color: #060
+}
+
+.boxcontent a {
+    color: #00e
+}
+
+.boxcontent dd {
+    border-bottom: solid #006 1px
+}
+
+.boxcontent dd.last {
+    border: none!important;
+    padding-bottom: 0
+}
+
+dt {
+    padding-top: 1em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: #006
+}
+
+dt.first {
+    padding-top: 0;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: #006
+}
+
+dd {
+    margin-left: 1em;
+    padding-bottom: 1.5em
+}
+
+hr {
+    border: 0;
+    color: #006;
+    background: #006;
+    height: 1px;
+    margin-top: 0;
+    margin-bottom: 1em
+}

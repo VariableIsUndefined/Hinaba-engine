@@ -3,6 +3,9 @@
 
 <head>
   <link rel="stylesheet" href="{{basename}}/static/css/staff_yotsubanew.css">
+  <style>
+    textarea { resize: none; }
+  </style>
 </head>
 
 % include('menu')
@@ -55,6 +58,7 @@
   </select>
   <input type="submit" value="Ban">
 </form>
+
 <table class="Reports" id="bans">
   <thead>
     <tr>

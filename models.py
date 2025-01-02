@@ -106,6 +106,13 @@ class Category(Model):
     
     class Meta:
         database = db
+        
+class Rule(Model):
+    board = CharField(default='')
+    description = TextField(default='')
+    
+    class Meta:
+        database = db
 
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, Category])
+    db.create_tables([Report, Post, Board, Anon, Captcha, Category, Rule])

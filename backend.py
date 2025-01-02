@@ -6,7 +6,7 @@ from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
 from waitress import serve
-from models import db, Post, Anon, Board, Report, Captcha, Category
+from models import db, Post, Anon, Board, Report, Captcha, Category, Rule
 from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
 from random import randint
@@ -678,11 +678,18 @@ def del_category(category_name):
 def error404(error):
     return template("error.tpl", basename=basename)
 
+# -- Rules management -- #
+
 @get('/rules')
 @view('rules')
 def rules():
     return dict(rules=config['app.rules'], basename=basename)
 
+@get('/faq')
+@view('faq')
+def rules():
+    return dict(faq=config['app.faq'], basename=basename)
+    
 if __name__ == '__main__':
 
     db.connect()
