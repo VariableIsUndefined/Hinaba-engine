@@ -24,7 +24,6 @@
 ## TODO:
 - Threads archieve
 - Roles: Janitor, Moderator, Administrator
-- Thread searching
 - Oekaki (drawing in browser)
 - API
 - Interface management
