@@ -1,5 +1,5 @@
 % from utils import author_color, image_size, is_video
-% from models import Post, Board
+% from models import Post, Board, FavoritePost
 
 <div class="thread" id="{{thread.refnum}}">
   <div class="postContainer opContainer">
@@ -106,10 +106,16 @@
           [<a class="btn Thread-repbtn" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}">Reply</a>]
         % end
 
+        % if FavoritePost.select().where(FavoritePost.anon == current_user, FavoritePost.post == thread).exists():
+          [<a href="{{basename}}/{{board_name}}/unfavorite/{{thread.refnum}}">Unfavorite</a>]
+        % else:
+          [<a href="{{basename}}/{{board_name}}/favorite/{{thread.refnum}}">Favorite</a>]
+        % end
+
         % if f':{board_name}:' in current_user.mod:
           [<a class="dropin" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/pin">Pin</a>]
           [<a class="dropc" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/close">Close</a>]
-        % end 
+        % end
       </div>
 
       <blockquote class="postMessage">

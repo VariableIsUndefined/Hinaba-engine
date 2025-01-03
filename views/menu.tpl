@@ -20,5 +20,6 @@
         [<a href="{{basename}}/{{board_name}}/mod">Mod</a>]
       % end
     % end
+    [<a href="{{basename}}/favorites" class="fopen">Favorites</a>]
   </span>
 </div>

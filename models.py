@@ -106,6 +106,17 @@ class Category(Model):
     
     class Meta:
         database = db
+        
+class FavoritePost(Model):
+    anon = ForeignKeyField(Anon, backref='favorites', on_delete='CASCADE')
+    post = ForeignKeyField(Post, backref='favorited_by', on_delete='CASCADE')
+    
+    class Meta:
+        database = db
+        
+        indexes = (
+            (('anon', 'post'), True),  # Unique anon + post
+        )
 
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, Category])
+    db.create_tables([Report, Post, Board, Anon, Captcha, Category, FavoritePost])
