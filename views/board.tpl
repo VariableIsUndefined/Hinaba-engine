@@ -69,10 +69,12 @@
     </table>
   </form>
 
-  <hr>
-
   <div id="ctrl-top" class="desktop">
-  [<a href="{{basename}}/{{board_name}}/catalog">Catalog</a>]
+    <hr>
+      <form action="{{basename}}/{{board_name}}/catalog" method="GET">
+        <input name="search" type="text" id="search-box" placeholder="Search OPs…" />
+        [<a href="{{basename}}/{{board_name}}/catalog">Catalog</a>]
+      </form>
   </div>
 
   <hr>

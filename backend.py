@@ -1,15 +1,16 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error, template)
-from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
+from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
 from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
 from waitress import serve
-from models import db, Post, Anon, Board, Report, Captcha, Category, Rule
+from models import db, Post, Anon, Board, Report, Captcha, Category
 from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
 from random import randint
+from peewee import fn
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -150,6 +151,15 @@ def catalog(board_name):
         return abort(404, "This page doesn't exist.")
 
     query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
+    
+    # The query search
+    
+    if request.query and request.query['search']:
+        search = request.query['search']
+        
+        query = board.posts.where(Post.is_reply == False, (
+        (Post.title.contains(search)) | (Post.content.contains(search))
+    )).order_by(Post.pinned.desc(), Post.bumped_at.desc())
 
     return dict(threads=query, board_name=board.name,
             board_title=board.title, board=board,
