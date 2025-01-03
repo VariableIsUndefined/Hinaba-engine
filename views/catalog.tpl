@@ -23,7 +23,11 @@
         </span>
       </div>
       <div id="settings" class="mobilebtn">
-
+        <span style="display: inline;" id="qf-cnt"  data-built="1">
+          <form action="{{basename}}/{{board_name}}/catalog" method="GET">
+            [Seach] <input name="search" type="text" id="qf-box" wfd-id="id9" />
+          </form>
+        </span>
       </div>
       <div class="clear"></div>
     </div>

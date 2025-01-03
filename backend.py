@@ -1,7 +1,7 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error, template)
-from utils import random_name, file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
+from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
 from json import loads, dumps
 from os import path, mkdir
 from string import punctuation
@@ -10,6 +10,7 @@ from models import db, Post, Anon, Board, Report, Captcha, Category, FavoritePos
 from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
 from random import randint
+from peewee import IntegrityError
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -150,6 +151,15 @@ def catalog(board_name):
         return abort(404, "This page doesn't exist.")
 
     query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
+    
+    # The query search
+    
+    if request.query and request.query['search']:
+        search = request.query['search']
+        
+        query = board.posts.where(Post.is_reply == False, (
+        (Post.title.contains(search)) | (Post.content.contains(search))
+    )).order_by(Post.pinned.desc(), Post.bumped_at.desc())
 
     return dict(threads=query, board_name=board.name,
             board_title=board.title, board=board,
@@ -687,7 +697,58 @@ def rules():
 @view('faq')
 def rules():
     return dict(faq=config['app.faq'], basename=basename)
+
+# -- Favorite posts -- #
+
+@get('/<board_name>/favorite/<refnum:int>')
+def add_to_favorites(board_name, refnum):
+    anon = get_current_user(request)
+    thread = Post.select().where(Post.refnum == refnum, Post.is_reply == False).get()
     
+    try:
+        data = {
+            "anon": anon,
+            "post": thread,
+        }
+        
+        favorite_post = FavoritePost(**data)
+        favorite_post.save()
+    except Post.DoesNotExist:
+        response.status = 404
+    except IntegrityError:
+        response.status = 409
+    
+    return redirect(f'{basename}/{board_name}/')
+
+@get('/<board_name>/unfavorite/<refnum:int>')
+def remove_from_favorites(board_name, refnum):
+    anon = get_current_user(request)
+    thread = Post.select().where(Post.refnum == refnum, Post.is_reply == False).get()
+    
+    query = FavoritePost.delete().where(
+        (FavoritePost.anon == anon) & (FavoritePost.post == thread)
+    )
+    
+    if query.execute() == 0:
+        response.status = 404
+    
+    return redirect(f'{basename}/{board_name}/')
+
+@get('/favorites')
+def get_favorites():
+    anon = get_current_user(request)
+    if not anon:
+        response.status = 403
+        return {"error": "Unauthorized"}
+
+    favorites = (FavoritePost
+                .select(FavoritePost, Post)
+                .join(Post)
+                .where(FavoritePost.anon == anon))
+    
+    return {"favorites": [{"id": fav.post.id, "title": fav.post.title, "board_name": fav.post.board.name, "board_id": fav.post.board.id} for fav in favorites]}
+
+
 if __name__ == '__main__':
 
     db.connect()
