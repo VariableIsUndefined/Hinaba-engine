@@ -1,51 +1,43 @@
-# PyChan - Imageboard Engine made with Python
-![Screenshot](home.png)
-![Screenshot](image.png)
-![Screenshot](catalog.png)
+# 🌸 Hinaba - Next-Gen Imageboard Engine 
+![Screenshot](home.png)  
+![Screenshot](image.png)  
+![Screenshot](catalog.png)  
 
-## Features
-- Customizable categories for boards
-- Markdown: bold (**), italic (*), underline (__), spoiler (%%) and code (`)
-- Green (>) and Pink (<) text
-- Quick replies
-- Reply previews
-- Closing/pinning threads
-- Mod and Admin functions
-- Youtube embeds
-- Captcha
-- Mobile responsive design (through CSS media queries)
-- Tripcodes (secured, and non-secured)
-- Mods are able to see poster's IP
-- Sage (Thread won't get bumped if you type "sage" in Email field)
-- Noko (You will stay at thread page if you type "noko" in email field)
-- Dice rolling
-- Capcodes (Set the capcode for user in admin panel. Use can post with/out capcode). Available capcodes: ## Verified, ## Mod, ## Admin, ## Developer, ## Manager, ## Founder
+### 🚀 Features  
+Hinaba is a powerful and flexible imageboard engine written in Python, packed with modern features:  
 
-## TODO:
-- Threads archieve
-- Roles: Janitor, Moderator, Administrator
-- Oekaki (drawing in browser)
-- API
-- Interface management
-- Live threads update
-- Janitors/Mods actions logging
-- Individual configuration for every board: bump limit, max file size, max message size, oekaki, rules, etc.
+- **Categories and Boards**: Create custom categories for boards.  
+- **Markdown Support**: Includes bold (**), italic (*), underline (__), spoilers (%%), and inline code (`).  
+- **Color-coded Text**: Green (>) and pink (<).  
+- **Quick Replies and Message Previews**.  
+- **Moderation Tools**: Close/pin threads, administrative functions.  
+- **Mobile Design**: Fully responsive with CSS media queries.  
+- **Tripcodes and Capcodes**: Support for both secure and non-secure tripcodes, as well as capcodes for moderators and admins.  
+- **Captcha Integration**: Helps prevent spam.  
+- **Limits**: Upload size restrictions, thread limits, and message size caps.  
+- **YouTube Embeds and Dice Rolls**.  
 
-## Warning
+### 🛠️ TODO  
+Planned features:  
 
-Imageboard style inspired by 4chan Yotsuba.
+- Thread archiving.  
+- Role system: Janitor, Moderator, Administrator.  
+- API and live thread updates.  
+- Oekaki (drawing in the browser).  
+- Moderator action logging.  
+- Individual board settings: bump limits, file size caps, message length, rules, etc.  
 
-Downloading latest release instead of cloning repository is highly recommended.
-The current repository may be unstable.
-Use current it at your own risk.
+### ⚠️ Warning  
+**The current repository version might be unstable.**  
+It is highly recommended to use the latest release instead.  
 
-## Guide
+### 🧑‍💻 Installation  
 
-1. Clone the repository and access the folder:
+1. Clone the repository and navigate to the folder:  
 
-`$ git clone https://github.com/VariableIsUndefined/PyChan-engine.git`
+`$ git clone https://github.com/VariableIsUndefined/Hinaba-engine.git`
 
-`$ cd PyChan-engine`
+`$ cd Hinaba-engine`
 
 2. Get the dependencies
 
@@ -61,6 +53,6 @@ Use current it at your own risk.
 
 Admin dashboard is at `/admin` for which you'll first have to go through `/login`.
 
-## Notes
-- The functions to limit the size of uploads and reverse proxy only work in production mode.
-- To use a MySQL database install pymysql, and psycopg2 for Postgresql.
+### 📚 Notes
+- To use a MySQL database install ```pymysql```, and ```psycopg2``` for Postgresql.
+- Upload size limits and reverse proxy settings work only in production mode.
