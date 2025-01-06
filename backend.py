@@ -816,6 +816,7 @@ if __name__ == '__main__':
     db.connect()
 
     if not path.isdir('uploads'): mkdir('uploads')
+    if not path.isdir('banners'): mkdir('banners')
     
     url_prefix = basename
 
