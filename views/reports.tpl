@@ -86,3 +86,33 @@
     % end
   </tbody>
 </table>
+
+<div class="boardBanner"><div class="boardTitle">Banners</div></div>
+
+<form class="banForm" action="{{basename}}/{{board_name}}/upload_banner" method="POST" enctype="multipart/form-data">
+  <input type="file" name="upload" required>
+  <input type="submit" value="Add">
+</form>
+
+<table class="Reports" id="bans">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>File name</th>
+      <td></td>
+    </tr>
+  </thead>  
+  <tbody>
+    % for banner in banners:
+      <tr>
+      	<td>{{banner.id}}</td>
+      	<td>{{banner.file_name}}</td>
+        <td>
+          <form action="{{basename}}/{{board_name}}/del_banner/{{banner.id}}" method="POST">
+            <input type="submit" value="Delete"></input>
+          </form>
+        </td>
+      </tr>
+    % end
+  </tbody>
+</table>

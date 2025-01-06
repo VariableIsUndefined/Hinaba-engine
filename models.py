@@ -117,6 +117,15 @@ class FavoritePost(Model):
         indexes = (
             (('anon', 'post'), True),  # Unique anon + post
         )
+        
+class Banner(Model):
+    board = ForeignKeyField(Board, backref='banners', on_delete='CASCADE')
+    file = CharField()
+    file_name = CharField()
+    archived = BooleanField(default=False)
+    
+    class Meta:
+        database = db
 
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, Category, FavoritePost])
+    db.create_tables([Report, Post, Board, Anon, Captcha, Category, FavoritePost, Banner])

@@ -8,11 +8,17 @@
   % include('menu')
   <span id="id_css"></span>
   <div class="boardBanner">
+  
+    % if banner:
+      <img alt="banner" src="{{basename}}/{{banner}}"  style="max-width: 100%;">
+    % end
+
     <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>
     % if board.nsfw:
       <div class="boardTitle"> [<span class="nsfw">NSFW</span>] </div>
     % end
   </div>
+
   <hr class="abovePostForm">
 
   <form class="Formulario" method="POST" action="{{basename}}/{{board_name}}/" enctype="multipart/form-data">

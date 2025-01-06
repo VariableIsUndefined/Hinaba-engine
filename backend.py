@@ -3,14 +3,16 @@ from bottle import (run, static_file, request, view, redirect,
         abort, get, post, ConfigDict, response, default_app, error, template)
 from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
 from json import loads, dumps
-from os import path, mkdir
+from os import path, mkdir, makedirs
 from string import punctuation
 from waitress import serve
-from models import db, Post, Anon, Board, Report, Captcha, Category, FavoritePost
+from models import db, Post, Anon, Board, Report, Captcha, Category, FavoritePost, Banner
 from datetime import datetime,timedelta,UTC
 from captcha.image import ImageCaptcha
-from random import randint
+from random import randint, choice
 from peewee import IntegrityError
+from uuid import uuid4
+import filetype
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -27,8 +29,14 @@ def send_static(filename):
 def send_upload(filename):
     return static_file(filename, root='uploads')
 
+@get('/banners/<board_name>/<file_name>')
+def serve_banner(board_name, file_name):
+    return static_file(file_name, root=path.join("banners", board_name))
+
 def get_current_user(req):
-    ip = req.get('REMOTE_ADDR')
+    ip = req.get('HTTP_X_FORWARDED_FOR')
+    
+    if ip is None: ip = req.get('REMOTE_ADDR')
 
     try:
         current_user = Anon.get(Anon.ip == ip)
@@ -100,6 +108,9 @@ def get_board(board_name, page=1):
     query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
 
     threads = query.paginate(page, per_page)
+    
+    banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
+    banner = choice(banners) if banners.exists() else None
 
     return dict(
             board_name=board.name, board_title=board.title,
@@ -109,6 +120,7 @@ def get_board(board_name, page=1):
             max_file_size=config['uploads.upload_max_size'],
             maxlength=config['threads.content_max_length'],
             per_page=per_page, basename=basename,
+            banner=banner.file if banner else None,
             host='://'.join(request.urlparts[:2])
         )
 
@@ -180,10 +192,12 @@ def reports(board_name):
         return redirect(f'{basename}/{board_name}/')
 
     report_reasons = loads(config['reports.reasons'])
+    banners = Banner.select().where(Banner.board == board)
 
     return dict(board=board, bans=Anon.select().where(Anon.banned == True),
             current_user=current_user, board_name=board_name,
-            reasons=report_reasons, reports=board.reports, basename=basename)
+            reasons=report_reasons, reports=board.reports, basename=basename,
+            banners=banners)
 
 @get('/admin')
 @view('admin')
@@ -519,6 +533,54 @@ def unban(board_name, name):
 
     return redirect(f'{basename}/{board_name}/mod')
 
+# -- Banners -- #
+
+@post('/<board_name>/upload_banner')
+def upload_banner(board_name):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    upload = request.files.get('upload')
+    print(upload)
+    if not upload:
+         return abort(400, "Please upload banner file!")
+     
+    file_ext = path.splitext(upload.filename)[1].lower()
+    if file_ext not in ['.jpg', '.jpeg', '.png', '.gif']:
+        return abort(400, "Unacceptable file extension. Please use: .jpg, .jpeg, .png, .gif")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+    
+    board_folder = path.join("banners", board_name)
+    makedirs(board_folder, exist_ok=True)
+
+    unique_name = f"{uuid4().hex}{file_ext}"
+    file_path = path.join(board_folder, unique_name)
+    upload.save(file_path)
+
+    Banner.create(board=board, file=file_path, file_name=upload.filename)
+    
+    return redirect(f"{basename}/{board_name}/mod")
+
+@post('/<board_name>/del_banner/<banner_id>')
+def del_category(board_name, banner_id):
+
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+
+    banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
+    banner.delete_instance()
+
+    return redirect(f"{basename}/{board_name}/mod")
+
 @post('/add_board')
 def add_board():
 
@@ -748,17 +810,50 @@ def get_favorites():
     
     return {"favorites": [{"id": fav.post.id, "title": fav.post.title, "board_name": fav.post.board.name, "board_id": fav.post.board.id} for fav in favorites]}
 
-
 if __name__ == '__main__':
 
     db.connect()
 
     if not path.isdir('uploads'): mkdir('uploads')
+    
+    url_prefix = basename
 
-    if config['app.production'] == 'True':
-        upload_max_size = int(config['uploads.upload_max_size'])
-        application = default_app()
-        serve(application, listen=config['app.host']+':'+config['app.port'],
-               max_request_body_size=upload_max_size * 1024**2, url_prefix=basename)
-    else:
-        run(debug=True, reloader=True, host=config['app.host'], port=config['app.port'])
+    def fix_environ_middleware(app):
+      def fixed_app(environ, start_response):
+        path = environ['PATH_INFO']
+        if path.startswith("/"):
+            # strip extra slashes at the beginning of a path that starts
+            # with any number of slashes
+            path = "/" + path.lstrip("/")
+
+        if url_prefix:
+            # NB: url_prefix is guaranteed by the configuration machinery to
+            # be either the empty string or a string that starts with a single
+            # slash and ends without any slashes
+            if path == url_prefix:
+                # if the path is the same as the url prefix, the SCRIPT_NAME
+                # should be the url_prefix and PATH_INFO should be empty
+                path = ""
+            else:
+                # if the path starts with the url prefix plus a slash,
+                # the SCRIPT_NAME should be the url_prefix and PATH_INFO should
+                # the value of path from the slash until its end
+                url_prefix_with_trailing_slash = url_prefix + "/"
+                if path.startswith(url_prefix_with_trailing_slash):
+                    path = path[len(url_prefix) :]
+        environ['SCIPT_NAME'] = url_prefix
+        environ['PATH_INFO'] = path
+        return app(environ, start_response)
+      return fixed_app
+
+    app = default_app()
+    app.wsgi = fix_environ_middleware(app.wsgi)
+
+    production = bool(int(config['app.production']))
+
+    run(
+        debug    = not production,
+        reloader = not production,
+        host     = config['app.host'],
+        port     = config['app.port']
+    )
