@@ -8,6 +8,10 @@
 <body class="is_index board_{{board_name}} yotsuba_new ws">
   % include('menu')
   <div class="boardBanner">
+    % if banner:
+      <img alt="banner" src="{{basename}}/{{banner}}"  style="max-width: 30%;">
+    % end
+
     % if thread.title:
       <div class="boardTitle"> {{thread.title}} </div>
     % else:

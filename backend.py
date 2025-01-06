@@ -145,11 +145,15 @@ def get_thread(board_name, refnum):
         thread = board.posts.where(Post.refnum == refnum).get()
     except:
         abort(404, "This page doesn't exist.")
+        
+    banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
+    banner = choice(banners) if banners.exists() else None
 
     return dict(board_name=board.name, thread=thread, board=board,
             is_detail=True, current_user=get_current_user(request),
             max_file_size=config['uploads.upload_max_size'],
             maxlength=config['threads.content_max_length'], basename=basename,
+            banner=banner.file if banner else None,
             host='://'.join(request.urlparts[:2])
     )
 
@@ -161,6 +165,9 @@ def catalog(board_name):
         board = Board.get(Board.name == board_name)
     except:
         return abort(404, "This page doesn't exist.")
+    
+    banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
+    banner = choice(banners) if banners.exists() else None
 
     query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
     
@@ -175,7 +182,9 @@ def catalog(board_name):
 
     return dict(threads=query, board_name=board.name,
             board_title=board.title, board=board,
-            current_user=get_current_user(request), basename=basename)
+            current_user=get_current_user(request),
+            banner=banner.file if banner else None,
+            basename=basename)
 
 @get('/<board_name>/mod')
 @view('reports')
@@ -795,7 +804,7 @@ def upload_banner(board_name):
     return redirect(f"{basename}/{board_name}/mod")
 
 @post('/<board_name>/del_banner/<banner_id>')
-def del_category(board_name, banner_id):
+def del_banner(board_name, banner_id):
 
     if f':{board_name}:' not in get_current_user(request).mod:
         return abort(403, "You are not allowed to do this.")
@@ -810,6 +819,43 @@ def del_category(board_name, banner_id):
 
     return redirect(f"{basename}/{board_name}/mod")
 
+@post('/<board_name>/unarch_banner/<banner_id>')
+def unarchive_banner(board_name, banner_id):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+
+    try:
+        banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
+    except:
+        return abort(400, "The banner does not exist.")
+    
+    Banner.update(archived = False).where(Banner.id == banner_id).execute()
+    
+    return redirect(f"{basename}/{board_name}/mod")
+
+@post('/<board_name>/arch_banner/<banner_id>')
+def archive_banner(board_name, banner_id):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+
+    try:
+        banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
+    except:
+        return abort(400, "The banner does not exist.")
+    
+    Banner.update(archived = True).where(Banner.id == banner_id).execute()
+    
+    return redirect(f"{basename}/{board_name}/mod")
 
 if __name__ == '__main__':
 

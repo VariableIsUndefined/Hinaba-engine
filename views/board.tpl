@@ -10,7 +10,7 @@
   <div class="boardBanner">
   
     % if banner:
-      <img alt="banner" src="{{basename}}/{{banner}}"  style="max-width: 100%;">
+      <img alt="banner" src="{{basename}}/{{banner}}"  style="max-width: 30%;">
     % end
 
     <div class="boardTitle"> /{{board_name}}/ - {{board_title}} </div>

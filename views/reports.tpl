@@ -99,6 +99,8 @@
     <tr>
       <th>Id</th>
       <th>File name</th>
+      <th>Archived</th>
+      <td></td>
       <td></td>
     </tr>
   </thead>  
@@ -106,7 +108,23 @@
     % for banner in banners:
       <tr>
       	<td>{{banner.id}}</td>
-      	<td>{{banner.file_name}}</td>
+      	<td><a href="{{basename}}/{{banner.file}}">{{banner.file_name}}</a></td>
+        % if banner.archived:
+          <td><input name="isarchived" type="checkbox" checked readonly></td>
+        % else:
+          <td><input name="isarchived" type="checkbox" readonly></td>
+        % end
+        <td>
+          % if banner.archived:
+            <form action="{{basename}}/{{board_name}}/unarch_banner/{{banner.id}}" method="POST">
+              <input type="submit" value="Unarchive">
+            </form>
+          % else:
+            <form action="{{basename}}/{{board_name}}/arch_banner/{{banner.id}}" method="POST">
+              <input type="submit" value="Archive">
+            </form>
+          % end
+        </td>
         <td>
           <form action="{{basename}}/{{board_name}}/del_banner/{{banner.id}}" method="POST">
             <input type="submit" value="Delete"></input>
