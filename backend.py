@@ -533,54 +533,6 @@ def unban(board_name, name):
 
     return redirect(f'{basename}/{board_name}/mod')
 
-# -- Banners -- #
-
-@post('/<board_name>/upload_banner')
-def upload_banner(board_name):
-    if f':{board_name}:' not in get_current_user(request).mod:
-        return abort(403, "You are not allowed to do this.")
-    
-    upload = request.files.get('upload')
-    print(upload)
-    if not upload:
-         return abort(400, "Please upload banner file!")
-     
-    file_ext = path.splitext(upload.filename)[1].lower()
-    if file_ext not in ['.jpg', '.jpeg', '.png', '.gif']:
-        return abort(400, "Unacceptable file extension. Please use: .jpg, .jpeg, .png, .gif")
-    
-    try:
-        board = Board.get(Board.name == board_name)
-    except:
-        return abort(400, "The board does not exist.")
-    
-    board_folder = path.join("banners", board_name)
-    makedirs(board_folder, exist_ok=True)
-
-    unique_name = f"{uuid4().hex}{file_ext}"
-    file_path = path.join(board_folder, unique_name)
-    upload.save(file_path)
-
-    Banner.create(board=board, file=file_path, file_name=upload.filename)
-    
-    return redirect(f"{basename}/{board_name}/mod")
-
-@post('/<board_name>/del_banner/<banner_id>')
-def del_category(board_name, banner_id):
-
-    if f':{board_name}:' not in get_current_user(request).mod:
-        return abort(403, "You are not allowed to do this.")
-    
-    try:
-        board = Board.get(Board.name == board_name)
-    except:
-        return abort(400, "The board does not exist.")
-
-    banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
-    banner.delete_instance()
-
-    return redirect(f"{basename}/{board_name}/mod")
-
 @post('/add_board')
 def add_board():
 
@@ -809,6 +761,55 @@ def get_favorites():
                 .where(FavoritePost.anon == anon))
     
     return {"favorites": [{"id": fav.post.id, "title": fav.post.title, "board_name": fav.post.board.name, "board_id": fav.post.board.id} for fav in favorites]}
+
+# -- Banners -- #
+
+@post('/<board_name>/upload_banner')
+def upload_banner(board_name):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    upload = request.files.get('upload')
+    print(upload)
+    if not upload:
+         return abort(400, "Please upload banner file!")
+     
+    file_ext = path.splitext(upload.filename)[1].lower()
+    if file_ext not in ['.jpg', '.jpeg', '.png', '.gif']:
+        return abort(400, "Unacceptable file extension. Please use: .jpg, .jpeg, .png, .gif")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+    
+    board_folder = path.join("banners", board_name)
+    makedirs(board_folder, exist_ok=True)
+
+    unique_name = f"{uuid4().hex}{file_ext}"
+    file_path = path.join(board_folder, unique_name)
+    upload.save(file_path)
+
+    Banner.create(board=board, file=file_path, file_name=upload.filename)
+    
+    return redirect(f"{basename}/{board_name}/mod")
+
+@post('/<board_name>/del_banner/<banner_id>')
+def del_category(board_name, banner_id):
+
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(400, "The board does not exist.")
+
+    banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
+    banner.delete_instance()
+
+    return redirect(f"{basename}/{board_name}/mod")
+
 
 if __name__ == '__main__':
 
