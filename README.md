@@ -16,7 +16,7 @@ Hinaba is a powerful and flexible imageboard engine written in Python, packed wi
 - **Captcha Integration**: Helps prevent spam.  
 - **Limits**: Upload size restrictions, thread limits, and message size caps.  
 - **YouTube Embeds and Dice Rolls**.
-- **Banners for boards**: Create and archive banners for boards.
+- **Banners**: Create and archive banners for boards.
 ### 🛠️ TODO  
 Planned features:  
 
