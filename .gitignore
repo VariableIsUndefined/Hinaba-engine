@@ -128,7 +128,7 @@ dmypy.json
 .pyre/
 
 # app
-librechan.db
+pychan.db
 .mksh_history
 imageboard.conf
 uploads/
