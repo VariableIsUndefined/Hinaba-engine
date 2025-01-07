@@ -2,7 +2,19 @@
 % from utils import image_size
 
 <head>
-  <link rel="stylesheet" href="{{basename}}/static/css/yotsubanew.css">
+  % if style == "Yotsuba": 
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/yotsubanew.css">
+  % elif style == "Yotsuba B":
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/yotsubluenew.css">
+  % elif style == "Futaba":
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/futabanew.css">
+  % elif style == "Burichan":
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/burichannew.css">
+  % elif style == "Tommorow":
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/tommorow.css">
+  % elif style == "Photon":
+    <link rel="stylesheet" href="{{basename}}/static/css/styles/photon.css">
+  % end
 </head>
 
 <body class="is_index board_{{board_name}} yotsuba_new ws">

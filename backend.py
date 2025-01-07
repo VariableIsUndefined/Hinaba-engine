@@ -1,6 +1,6 @@
 #!/bin/env python
 from bottle import (run, static_file, request, view, redirect,
-        abort, get, post, ConfigDict, response, default_app, error, template)
+        abort, get, post, ConfigDict, response, default_app, error, template, route)
 from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
 from json import loads, dumps
 from os import path, mkdir, makedirs
@@ -12,7 +12,6 @@ from captcha.image import ImageCaptcha
 from random import randint, choice
 from peewee import IntegrityError
 from uuid import uuid4
-import filetype
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -20,6 +19,8 @@ config.load_config('imageboard.conf')
 basename = config['app.basename']
 
 if basename[-1] == '/': basename = basename[:-1] # remove trailing slash
+
+STYLES = config["style.styles"]
 
 @get('/static/<filename:path>')
 def send_static(filename):
@@ -111,7 +112,11 @@ def get_board(board_name, page=1):
     
     banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
     banner = choice(banners) if banners.exists() else None
-
+    
+    current_style = request.get_cookie('style', default='Yotsuba')
+    if current_style not in STYLES:
+        current_style = 'Yotsuba'
+                
     return dict(
             board_name=board.name, board_title=board.title,
             threads=threads, board=board, current_page=page,
@@ -121,6 +126,7 @@ def get_board(board_name, page=1):
             maxlength=config['threads.content_max_length'],
             per_page=per_page, basename=basename,
             banner=banner.file if banner else None,
+            style=current_style,
             host='://'.join(request.urlparts[:2])
         )
 
@@ -148,12 +154,17 @@ def get_thread(board_name, refnum):
         
     banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
     banner = choice(banners) if banners.exists() else None
+    
+    current_style = request.get_cookie('style', default='Yotsuba')
+    if current_style not in STYLES:
+        current_style = 'Yotsuba'
 
     return dict(board_name=board.name, thread=thread, board=board,
             is_detail=True, current_user=get_current_user(request),
             max_file_size=config['uploads.upload_max_size'],
             maxlength=config['threads.content_max_length'], basename=basename,
             banner=banner.file if banner else None,
+            style=current_style,
             host='://'.join(request.urlparts[:2])
     )
 
@@ -179,12 +190,16 @@ def catalog(board_name):
         query = board.posts.where(Post.is_reply == False, (
         (Post.title.contains(search)) | (Post.content.contains(search))
     )).order_by(Post.pinned.desc(), Post.bumped_at.desc())
+        
+    current_style = request.get_cookie('style', default='Yotsuba')
+    if current_style not in STYLES:
+        current_style = 'Yotsuba'
 
     return dict(threads=query, board_name=board.name,
             board_title=board.title, board=board,
             current_user=get_current_user(request),
             banner=banner.file if banner else None,
-            basename=basename)
+            style=current_style, basename=basename)
 
 @get('/<board_name>/mod')
 @view('reports')
@@ -856,6 +871,15 @@ def archive_banner(board_name, banner_id):
     Banner.update(archived = True).where(Banner.id == banner_id).execute()
     
     return redirect(f"{basename}/{board_name}/mod")
+
+# -- Styles -- #
+
+@route('/set_style/<style_name>')
+def set_style(style_name):
+    if style_name in STYLES:
+        response.set_cookie('style', style_name, path="/", max_age=3600)
+        
+    return ''
 
 if __name__ == '__main__':
 
