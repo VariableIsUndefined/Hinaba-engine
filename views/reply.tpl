@@ -61,7 +61,7 @@
 
       <span class="postNum">
         <a href="{{basename}}/{{board_name}}/thread/{{reply.replyrefnum}}#{{reply.refnum}}">No.</a>
-        <span class="dopen">{{reply.refnum}}</span>
+        <a class="dopen">{{reply.refnum}}</a>
       </span>
 
       % if reply.image:

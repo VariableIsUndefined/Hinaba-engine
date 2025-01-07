@@ -91,7 +91,7 @@
         <span class="dateTime">{{thread.date}}</span>
         <span class="postNum">
           <a href="{{basename}}/{{board_name}}/thread/{{thread.id}}">No.</a>
-          <span class="dopen">{{thread.refnum}}</span>
+          <a class="dopen">{{thread.refnum}}</a>
         </span>
 
         % if thread.pinned:
