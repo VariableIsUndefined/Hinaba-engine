@@ -17,6 +17,7 @@ Hinaba is a powerful and flexible imageboard engine written in Python, packed wi
 - **Limits**: Upload size restrictions, thread limits, and message size caps.  
 - **YouTube Embeds and Dice Rolls**.
 - **Banners**: Create and archive banners for boards.
+- **Styles**: Change styles: "Yotsuba", "Yotsuba B", "Futaba", "Burichan", "Tommorow" and "Photon"!
 ### 🛠️ TODO  
 Planned features:  
 
