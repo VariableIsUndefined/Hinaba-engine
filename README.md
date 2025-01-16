@@ -1,3 +1,6 @@
+[![GitHub Repo stars](https://img.shields.io/github/stars/VariableIsUndefined/Hinaba-engine?style=social)](https://github.com/VariableIsUndefined/Hinaba-engine)
+[![GitHub forks](https://img.shields.io/github/forks/VariableIsUndefined/Hinaba-engine?style=social)](https://github.com/VariableIsUndefined/Hinaba-engine)
+
 # 🌸 Hinaba - Next-Gen Imageboard Engine 
 ![Screenshot](home.png)  
 ![Screenshot](image.png)  
