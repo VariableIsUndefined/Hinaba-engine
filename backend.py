@@ -12,6 +12,9 @@ from captcha.image import ImageCaptcha
 from random import randint, choice
 from peewee import IntegrityError
 from uuid import uuid4
+from apscheduler.schedulers.background import BackgroundScheduler
+
+ARCHIVE_RETENTION_DAYS = 7
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -106,7 +109,7 @@ def get_board(board_name, page=1):
 
     per_page = int(config['threads.per_page'])
 
-    query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
+    query = board.posts.where(Post.is_reply == False, Post.is_archived == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
 
     threads = query.paginate(page, per_page)
     
@@ -180,7 +183,7 @@ def catalog(board_name):
     banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
     banner = choice(banners) if banners.exists() else None
 
-    query = board.posts.where(Post.is_reply == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
+    query = board.posts.where(Post.is_reply == False, Post.is_archived == False).order_by(Post.pinned.desc(), Post.bumped_at.desc())
     
     # The query search
     
@@ -339,7 +342,8 @@ def post_thread(board_name):
         "trip": trip if trip != '' else None,
         "sec_trip": sec_trip if sec_trip != '' else None,
         "email": email if email else None,
-        "capcode": current_user.capcode if capcode == "on" else ''
+        "capcode": current_user.capcode if capcode == "on" else '',
+        "is_archived": False,
     }
 
     thread = Post(**data)
@@ -381,6 +385,9 @@ def post_reply(board_name, refnum):
 
     if thread.closed:
         return abort(423, "You cannot reply because this thread is locked.")
+    
+    if thread.is_archived:
+        return abort(423, "You cannot reply because this thread is archived.")
 
     content = request.forms.get('content')
     author_name = request.forms.get('author')
@@ -441,6 +448,7 @@ def post_reply(board_name, refnum):
         "sec_trip": sec_trip if sec_trip != '' else None,
         "email": email if email else None,
         "capcode": current_user.capcode if capcode == "on" else '',
+        "is_archived": False,
     }
 
     reply = Post(**data)
@@ -460,13 +468,24 @@ def post_reply(board_name, refnum):
                         thread_ref.save()
                 except: pass
 
-    #sage: if "email" field is a sage, then thread won't get bumped
+    # sage: if "email" field is a sage, then thread won't get bumped
     if email != "sage":
         thread.bumped_at = datetime.now().replace(microsecond=0)
         thread.save()
 
     board.lastrefnum += 1
     board.save()
+    
+    ## -- Auto archive --
+    
+    bump_limit = int(config['threads.bump_limit'])
+
+    replies = board.posts.where(Post.is_reply == True, Post.refnum == refnum)
+
+    if replies.count() >= bump_limit:
+        
+        thread.is_archived = True
+        thread.save()
 
     # noko: if you type it in email field, you wont get redirect back to board, you will stay in thread
     if email == 'noko':
@@ -882,6 +901,59 @@ def set_style(style_name):
         
     return ''
 
+# -- Archive -- #
+@get('/<board_name>/archive')
+@view('archive')
+def get_archive(board_name):
+
+    try:
+        board = Board.get(Board.name == board_name)
+    except:
+        return abort(404, "This page doesn't exist.")
+        
+    banners = Banner.select().where((Banner.board == board) & (Banner.archived == False))
+    banner = choice(banners) if banners.exists() else None
+    
+    current_style = request.get_cookie('style', default='Yotsuba')
+    if current_style not in STYLES:
+        current_style = 'Yotsuba'
+
+    return dict(board_name=board.name, board=board,
+            board_title=board.title,
+            current_user=get_current_user(request),
+            basename=basename,
+            banner=banner.file if banner else None,
+            style=current_style,
+    )
+
+@get('/<board_name>/archive/<refnum:int>')
+def archive_thread(board_name, refnum):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:    
+        Post.update(is_archived=True).where(Post.refnum == refnum, Post.is_reply == False).execute()
+    except Post.DoesNotExist:
+        response.status = 404
+    except IntegrityError:
+        response.status = 409
+    
+    return redirect(f'{basename}/{board_name}/')
+
+@get('/<board_name>/unarchive/<refnum:int>')
+def unarchive_thread(board_name, refnum):
+    if f':{board_name}:' not in get_current_user(request).mod:
+        return abort(403, "You are not allowed to do this.")
+    
+    try:    
+        Post.update(is_archived=False).where(Post.refnum == refnum, Post.is_reply == False).execute()
+    except Post.DoesNotExist:
+        response.status = 404
+    except IntegrityError:
+        response.status = 409
+    
+    return redirect(f'{basename}/{board_name}/thread/{refnum}')
+
 if __name__ == '__main__':
 
     db.connect()
@@ -918,6 +990,18 @@ if __name__ == '__main__':
         environ['PATH_INFO'] = path
         return app(environ, start_response)
       return fixed_app
+  
+    # Archive cleanup job
+    def cleanup_archived_threads():
+        cutoff_date = datetime.now() - timedelta(days=ARCHIVE_RETENTION_DAYS)
+        query = Post.delete().where(Post.is_archived == True, Post.bumped_at < cutoff_date)
+        deleted_count = query.execute()
+        print(f"Deleted {deleted_count} archived threads older than {ARCHIVE_RETENTION_DAYS} days")
+
+    # Scheduler for periodic cleanup
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(cleanup_archived_threads, 'interval', days=1)
+    scheduler.start()
 
     app = default_app()
     app.wsgi = fix_environ_middleware(app.wsgi)

@@ -62,6 +62,7 @@ class Board(Model):
 class Post(Model):
     board = ForeignKeyField(Board, backref='posts')
     author = ForeignKeyField(Anon, backref='posts')
+    is_archived = BooleanField(default=False)
     author_name = CharField()
     refnum = IntegerField()
     replyrefnum = IntegerField(null=True)

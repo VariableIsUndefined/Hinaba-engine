@@ -113,6 +113,7 @@
         % end
 
         % if f':{board_name}:' in current_user.mod:
+          [<a class="dropin" href="{{basename}}/{{board_name}}/archive/{{thread.refnum}}">Archive</a>]
           [<a class="dropin" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/pin">Pin</a>]
           [<a class="dropc" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/close">Close</a>]
         % end

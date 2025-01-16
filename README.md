@@ -18,10 +18,10 @@ Hinaba is a powerful and flexible imageboard engine written in Python, packed wi
 - **YouTube Embeds and Dice Rolls**.
 - **Banners**: Create and archive banners for boards.
 - **Styles**: Change styles: "Yotsuba", "Yotsuba B", "Futaba", "Burichan", "Tommorow" and "Photon"!
+- **Automatic archiving**: Threads that reached bump limits are automatically archived. After 7 days they will get deleted.
 ### 🛠️ TODO  
 Planned features:  
 
-- Thread archiving.  
 - Role system: Janitor, Moderator, Administrator.  
 - API and live thread updates.  
 - Oekaki (drawing in the browser).  
