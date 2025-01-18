@@ -1000,7 +1000,7 @@ if __name__ == '__main__':
 
     # Scheduler for periodic cleanup
     scheduler = BackgroundScheduler()
-    scheduler.add_job(cleanup_archived_threads, 'interval', days=1)
+    scheduler.add_job(cleanup_archived_threads, 'interval', days=7)
     scheduler.start()
 
     app = default_app()
