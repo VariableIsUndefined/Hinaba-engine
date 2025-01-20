@@ -147,41 +147,30 @@ def short_msg(string):
     return ' '.join(string.split(" ")[:22]) + ellipsis
 
 def generate_trip(name):
+    name = re.sub(r"\#+$", "", re.sub(r"[\r\n]", "", name.strip()))
+    
     info = {
         "author_name": name,
         "trip": "",
         "sec_trip": "",
     }
     
-    name = re.sub(r"[\r\n]", "", name).strip()
-    
-    if re.search(r"\#+$", name):
-        name = re.sub(r"\#+$", "", name)
-    
     if '#' in name:
         name = name.replace("&#", "&&")
         parts = name.replace("&&", "&#").split("#", 2)
-        if len(parts) == 2:
-            nametemp, trip = parts
-            sectrip = ""
-        elif len(parts) == 3:
-            nametemp, trip, sectrip = parts
-        else:
-            nametemp = parts[0]
-            trip = sectrip = ""
+        
+        name_temp = parts[0]
+        trip = parts[1] if len(parts) > 1 else ""
+        sec_trip = parts[2] if len(parts) > 2 else ""
             
-        info["author_name"] = nametemp
+        info["author_name"] = name_temp
         
         if trip != "":
             info["trip"] = tripcode(trip)
                     
-        if sectrip != "":
-            salt = config["security.trip_salt"]
-            
-            if not salt:
-                salt = "ofTSVIrPGK" #Something random
-            
-            sha = base64.b64encode(hashlib.sha1((sectrip + salt).encode()).digest()).decode()[:11]
+        if sec_trip != "":
+            salt = config.get("security.trip_salt", "ofTSVIrPGK") 
+            sha = base64.b64encode(hashlib.sha1((sec_trip + salt).encode()).digest()).decode()[:11]
             info["sec_trip"] = sha
                         
     return info
