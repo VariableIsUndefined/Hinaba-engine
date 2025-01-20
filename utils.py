@@ -8,13 +8,14 @@ from string import ascii_lowercase
 from PIL import Image
 from tripcode import tripcode
 from bottle import ConfigDict
+from typing import Optional, Dict, Any
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
 
-def thumbnail(path, refnum, ext, is_reply=False):
-
-    save_path = "/".join(path.split("/")[0:2]) + "/" + str(refnum) + "s.jpg"
+def thumbnail(path: str, refnum: int, ext: str, is_reply: bool = False) -> None:
+    """Creates a thumbnail for an image."""
+    save_path = f"{'/'.join(path.split('/')[:2])}/{refnum}s.jpg"
 
     with Image.open(path) as im:
 
@@ -32,7 +33,7 @@ def thumbnail(path, refnum, ext, is_reply=False):
 
         if ext == '.png' and im.mode == "RGBA":
 
-            bg = Image.new("RGB", (thumb_width, thumb_height), (255,255,255))
+            bg = Image.new("RGB", (thumb_width, thumb_height), (255, 255, 255))
 
             bg.paste(im, im)
             bg.save(save_path)
@@ -43,21 +44,19 @@ def thumbnail(path, refnum, ext, is_reply=False):
         else:
             im.save(save_path)
 
-def file_validation(board_name, refnum, upload, is_reply=False): 
-
+def file_validation(board_name: str, refnum: int, upload: Any, is_reply: bool = False) -> Optional[str | int]:
+    """Validates uploaded file and creates a thumbnail if valid."""
     name, ext = os.path.splitext(upload.filename)
 
-    valid_ext = ('png','jpg','jpeg','gif', 'mp4', 'webm', 'ogg')
+    valid_ext = ('png', 'jpg', 'jpeg', 'gif', 'mp4', 'webm', 'ogg')
 
     if ext[1:] not in valid_ext:
         return 1
 
-    save_path = "uploads/%s/%s%s" % (board_name, refnum, ext)
-    
+    save_path = f"uploads/{board_name}/{refnum}{ext}"
     upload.save(save_path)
 
     mime = filetype.guess(save_path)
-
     if mime.EXTENSION not in valid_ext or mime.EXTENSION != ext[1:]:
         os.remove(save_path)
         return 1
@@ -66,21 +65,27 @@ def file_validation(board_name, refnum, upload, is_reply=False):
 
     return save_path
 
-def remove_media(path):
-
+def remove_media(path: str) -> None:
+    """Removes a file and its associated thumbnail."""
     name, ext = os.path.splitext(path)
 
-    if ext not in ('.mp4', '.webm', '.ogg'): os.remove(name + "s.jpg")
+    if ext not in ('.mp4', '.webm', '.ogg'):
+        os.remove(name + "s.jpg")
 
     os.remove(path)
 
-def random_name(): return ''.join(random.choices(ascii_lowercase, k=8))
+def random_name() -> str:
+    """Generates a random name."""
+    return ''.join(random.choices(ascii_lowercase, k=8))
 
-def board_directory(name, remove=False):
-    if remove: shutil.rmtree("uploads/%s" % name)
-    else: os.makedirs("uploads/%s" % name, exist_ok=True)
+def board_directory(name: str, remove: bool = False) -> None:
+    """Creates or removes a board directory."""
+    if remove:
+        shutil.rmtree(f"uploads/{name}")
+    else:
+        os.makedirs(f"uploads/{name}", exist_ok=True)
 
-def get_size_format(b, factor=1024, suffix="B"):
+def get_size_format(b: int, factor: int = 1024, suffix: str = 'B') -> str:
     """
     Scale bytes to its proper byte format
     e.g:
@@ -93,7 +98,7 @@ def get_size_format(b, factor=1024, suffix="B"):
         b /= factor
     return f"{b:.2f}Y{suffix}"
 
-def get_directory_size(directory):
+def get_directory_size(directory: str) -> int:
     """Returns the `directory` size in bytes."""
     total = 0
     try:
@@ -113,108 +118,92 @@ def get_directory_size(directory):
         return 0
     return total
 
-def author_color(author):
+def author_color(author: str) -> str:
+    """Generates a consistent color for an author."""
     return '#' + hashlib.blake2b(author.encode()).hexdigest()[:6]
 
-def image_size(path):
-
+def image_size(path: str) -> str:
+    """Returns the size and dimensions of an image or video."""
     size = os.stat(path).st_size
 
     if not is_video(path):
-
         with Image.open(path) as im:
-
             width, height = im.size
-
-        return "%s, %s x %s" % (get_size_format(size), width, height)
+        return f"{get_size_format(size)}, {width} x {height}"
     else:
         return get_size_format(size)
 
-def is_video(filename):
-
+def is_video(filename: str) -> bool:
+    """Checks if a file is a video based on its extension."""
     name, ext = os.path.splitext(filename)
 
     if ext in ('.webm', '.mp4', '.ogg'): return True
 
     return False
 
-def short_msg(string):
+def short_msg(string: str) -> str:
+    """Trims a message to a short preview."""
+    words = string.split()
+    return ' '.join(words[:22]) + (' ...' if len(words) > 22 else '')
 
-    ellipsis = ""
+def generate_trip(name: str) -> Dict[str, Optional[str]]:
+    """Generates tripcodes for a user."""
+    name = re.sub(r"\#+$", "", re.sub(r"[\r\n]", "", name.strip()))
 
-    if len(string.split(" ")) > 22: ellipsis = " ..."
-
-    return ' '.join(string.split(" ")[:22]) + ellipsis
-
-def generate_trip(name):
     info = {
         "author_name": name,
         "trip": "",
         "sec_trip": "",
     }
-    
-    name = re.sub(r"[\r\n]", "", name).strip()
-    
-    if re.search(r"\#+$", name):
-        name = re.sub(r"\#+$", "", name)
-    
+
     if '#' in name:
         name = name.replace("&#", "&&")
         parts = name.replace("&&", "&#").split("#", 2)
-        if len(parts) == 2:
-            nametemp, trip = parts
-            sectrip = ""
-        elif len(parts) == 3:
-            nametemp, trip, sectrip = parts
-        else:
-            nametemp = parts[0]
-            trip = sectrip = ""
-            
-        info["author_name"] = nametemp
-        
+
+        name_temp = parts[0]
+        trip = parts[1] if len(parts) > 1 else ""
+        sec_trip = parts[2] if len(parts) > 2 else ""
+
+        info["author_name"] = name_temp
+
         if trip != "":
             info["trip"] = tripcode(trip)
-                    
-        if sectrip != "":
-            salt = config["security.trip_salt"]
-            
-            if not salt:
-                salt = "ofTSVIrPGK" #Something random
-            
-            sha = base64.b64encode(hashlib.sha1((sectrip + salt).encode()).digest()).decode()[:11]
+
+        if sec_trip != "":
+            salt = config.get("security.trip_salt", "ofTSVIrPGK")
+            sha = base64.b64encode(hashlib.sha1((sec_trip + salt).encode()).digest()).decode()[:11]
             info["sec_trip"] = sha
-                        
+
     return info
 
-def dice(email):
-    # a dice func for "email" field
-    
+def dice(email: Optional[str]) -> Optional[str] | None:
+    """Simulates dice rolls based on the email field."""
     if email:
         match = re.search(r"dice[ +](\d+)[ d+](\d+)(([ +-]+?)(-?\d+))?", email)
         if match:
-            dicetxt = "rolled "
-            dicenum = min(25, int(match.group(1)))
-            diceside = int(match.group(2))
-            diceaddexpr = match.group(3)
-            dicesign = match.group(4)
-            diceadd = int(match.group(5)) if match.group(5) else 0
-            
-            dicesum = 0
-            for i in range(dicenum):
-                dicerand = random.randint(1, diceside)
+            dice_txt = "rolled "
+            dice_num = min(25, int(match.group(1)))
+            dice_side = int(match.group(2))
+            dice_add_expr = match.group(3)
+            dice_sign = match.group(4)
+            dice_add = int(match.group(5)) if match.group(5) else 0
+
+            dice_sum = 0
+            for i in range(dice_num):
+                dice_rand = random.randint(1, dice_side)
                 if i:
-                    dicetxt += ", "
-                dicetxt += str(dicerand)
-                dicesum += dicerand
-            
-            if diceaddexpr:
-                if "-" in dicesign:
-                    diceadd *= -1
-                dicetxt += (" + " if diceadd >= 0 else " - ") + str(abs(diceadd))
-                dicesum += diceadd
-            
-            dicetxt += f" = {dicesum}"
-            
-            return dicetxt
-    
+                    dice_txt += ", "
+                dice_txt += str(dice_rand)
+                dice_sum += dice_rand
+
+            if dice_add_expr:
+                if "-" in dice_sign:
+                    dice_add *= -1
+                dice_txt += (" + " if dice_add >= 0 else " - ") + str(abs(dice_add))
+                dice_sum += dice_add
+
+            dice_txt += f" = {dice_sum}"
+
+            return dice_txt
+
     return None
