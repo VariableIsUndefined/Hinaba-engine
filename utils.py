@@ -149,7 +149,6 @@ def short_msg(string: str) -> str:
 def generate_trip(name: str) -> Dict[str, Optional[str]]:
     """Generates tripcodes for a user."""
     name = re.sub(r"\#+$", "", re.sub(r"[\r\n]", "", name.strip()))
-
     info = {
         "author_name": name,
         "trip": "",
