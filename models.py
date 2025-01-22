@@ -1,7 +1,9 @@
 import datetime
 from peewee import *
 from bottle import ConfigDict
+from typing import Optional
 
+# Load configuration
 try:
     with open('imageboard.conf') as f:
         pass
@@ -12,32 +14,32 @@ except FileNotFoundError:
 config = ConfigDict()
 config.load_config('imageboard.conf')
 
+# Database initialization
 if config['database.engine'] == 'sqlite':
-
     db = SqliteDatabase(f'{config["database.name"]}.db')
-    
 elif config['database.engine'] == 'postgresql':
-
     db = PostgresqlDatabase(
         config['database.name'],
-        user     = config['database.username'],
-        password = config['database.password'],
-        host     = config['database.host'],
-        port     = int(config['database.port'])
+        user=config['database.username'],
+        password=config['database.password'],
+        host=config['database.host'],
+        port=int(config['database.port'])
     )
-
 elif config['database.engine'] == 'mysql':
-
     db = MySQLDatabase(
         config['database.name'],
-        user     = config['database.username'],
-        password = config['database.password'],
-        host     = config['database.host'],
-        port     = int(config['database.port'])
+        user=config['database.username'],
+        password=config['database.password'],
+        host=config['database.host'],
+        port=int(config['database.port'])
     )
 
-class Anon(Model):
-    #name = CharField()
+# Models
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+class Anon(BaseModel):
     ip = IPField()
     banned = BooleanField(default=False)
     mod = CharField(default="")
@@ -46,20 +48,14 @@ class Anon(Model):
     ban_reason = CharField(null=True)
     ban_date = DateTimeField(null=True)
 
-    class Meta:
-        database = db
-
-class Board(Model):
+class Board(BaseModel):
     name = CharField()
     title = CharField()
     category = CharField(null=False)
     nsfw = BooleanField(default=False)
     lastrefnum = IntegerField(default=1)
 
-    class Meta:
-        database = db
-
-class Post(Model):
+class Post(BaseModel):
     board = ForeignKeyField(Board, backref='posts')
     author = ForeignKeyField(Anon, backref='posts')
     is_archived = BooleanField(default=False)
@@ -79,54 +75,37 @@ class Post(Model):
     pinned = BooleanField(default=False)
     replylist = CharField(default="[]")
     capcode = CharField(default='')
-    # Add tripcodes
     trip = CharField(null=True)
     sec_trip = CharField(null=True)
 
-    class Meta:
-        database = db
-
-class Report(Model):
+class Report(BaseModel):
     reason = CharField()
     refnum = IntegerField()
     date = DateTimeField()
     board = ForeignKeyField(Board, backref='reports')
 
-    class Meta:
-        database = db
-
-class Captcha(Model):
+class Captcha(BaseModel):
     text = CharField()
     time_exp = DateTimeField()
 
-    class Meta:
-        database = db
+class Category(BaseModel):
+    name = CharField(unique=True, null=False)
 
-class Category(Model):
-    name = CharField(null=False)
-    
-    class Meta:
-        database = db
-        
-class FavoritePost(Model):
+class FavoritePost(BaseModel):
     anon = ForeignKeyField(Anon, backref='favorites', on_delete='CASCADE')
     post = ForeignKeyField(Post, backref='favorited_by', on_delete='CASCADE')
-    
+
     class Meta:
-        database = db
-        
         indexes = (
             (('anon', 'post'), True),  # Unique anon + post
         )
-        
-class Banner(Model):
+
+class Banner(BaseModel):
     board = ForeignKeyField(Board, backref='banners', on_delete='CASCADE')
     file = CharField()
     file_name = CharField()
     archived = BooleanField(default=False)
-    
-    class Meta:
-        database = db
 
+# Create tables
 with db:
     db.create_tables([Report, Post, Board, Anon, Captcha, Category, FavoritePost, Banner])
