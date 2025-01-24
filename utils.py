@@ -13,6 +13,7 @@ from typing import Optional, Dict, Any
 config = ConfigDict()
 config.load_config('imageboard.conf')
 
+
 def thumbnail(path: str, refnum: int, ext: str, is_reply: bool = False) -> None:
     """Creates a thumbnail for an image."""
     save_path = f"{'/'.join(path.split('/')[:2])}/{refnum}s.jpg"
@@ -44,6 +45,7 @@ def thumbnail(path: str, refnum: int, ext: str, is_reply: bool = False) -> None:
         else:
             im.save(save_path)
 
+
 def file_validation(board_name: str, refnum: int, upload: Any, is_reply: bool = False) -> Optional[str | int]:
     """Validates uploaded file and creates a thumbnail if valid."""
     name, ext = os.path.splitext(upload.filename)
@@ -65,6 +67,7 @@ def file_validation(board_name: str, refnum: int, upload: Any, is_reply: bool = 
 
     return save_path
 
+
 def remove_media(path: str) -> None:
     """Removes a file and its associated thumbnail."""
     name, ext = os.path.splitext(path)
@@ -74,9 +77,11 @@ def remove_media(path: str) -> None:
 
     os.remove(path)
 
+
 def random_name() -> str:
     """Generates a random name."""
     return ''.join(random.choices(ascii_lowercase, k=8))
+
 
 def board_directory(name: str, remove: bool = False) -> None:
     """Creates or removes a board directory."""
@@ -84,6 +89,7 @@ def board_directory(name: str, remove: bool = False) -> None:
         shutil.rmtree(f"uploads/{name}")
     else:
         os.makedirs(f"uploads/{name}", exist_ok=True)
+
 
 def get_size_format(b: int, factor: int = 1024, suffix: str = 'B') -> str:
     """
@@ -97,6 +103,7 @@ def get_size_format(b: int, factor: int = 1024, suffix: str = 'B') -> str:
             return f"{b:.2f}{unit}{suffix}"
         b /= factor
     return f"{b:.2f}Y{suffix}"
+
 
 def get_directory_size(directory: str) -> int:
     """Returns the `directory` size in bytes."""
@@ -118,9 +125,11 @@ def get_directory_size(directory: str) -> int:
         return 0
     return total
 
+
 def author_color(author: str) -> str:
     """Generates a consistent color for an author."""
     return '#' + hashlib.blake2b(author.encode()).hexdigest()[:6]
+
 
 def image_size(path: str) -> str:
     """Returns the size and dimensions of an image or video."""
@@ -133,6 +142,7 @@ def image_size(path: str) -> str:
     else:
         return get_size_format(size)
 
+
 def is_video(filename: str) -> bool:
     """Checks if a file is a video based on its extension."""
     name, ext = os.path.splitext(filename)
@@ -141,10 +151,12 @@ def is_video(filename: str) -> bool:
 
     return False
 
+
 def short_msg(string: str) -> str:
     """Trims a message to a short preview."""
     words = string.split()
     return ' '.join(words[:22]) + (' ...' if len(words) > 22 else '')
+
 
 def generate_trip(name: str) -> Dict[str, Optional[str]]:
     """Generates tripcodes for a user."""
@@ -175,7 +187,8 @@ def generate_trip(name: str) -> Dict[str, Optional[str]]:
 
     return info
 
-def dice(email: Optional[str]) -> Optional[str] | None:
+
+def dice(email: Optional[str]) -> str | None:
     """Simulates dice rolls based on the email field."""
     if email:
         match = re.search(r"dice[ +](\d+)[ d+](\d+)(([ +-]+?)(-?\d+))?", email)
