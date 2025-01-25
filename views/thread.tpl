@@ -106,6 +106,8 @@
           [<a class="btn Thread-repbtn" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}">Reply</a>]
         % end
 
+        [<a class="btn" title="Export as JSON" href="{{basename}}/{{board_name}}/thread/{{thread.refnum}}/export">Export</a>]
+
         % if FavoritePost.select().where(FavoritePost.anon == current_user, FavoritePost.post == thread).exists():
           [<a href="{{basename}}/{{board_name}}/unfavorite/{{thread.refnum}}">Unfavorite</a>]
         % else:

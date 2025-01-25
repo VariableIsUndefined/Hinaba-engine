@@ -975,6 +975,48 @@ def unarchive_thread(board_name: str, refnum: int):
     return redirect(f'{basename}/{board_name}/thread/{refnum}')
 
 
+# -- Exporting thread -- #
+@get('/<board_name>/thread/<refnum:int>/export')
+def export_thread(board_name: str, refnum: int):
+    try:
+        board = Board.get(Board.name == board_name)
+        thread = Post.get(Post.board == board, Post.refnum == refnum, Post.is_reply == False)
+
+        replies = Post.select().where(Post.board == board, Post.replyrefnum == refnum, Post.is_reply == True)
+
+        thread_data = {
+            "id": thread.refnum,
+            "board": board.name,
+            "author": thread.author_name,
+            "title": thread.title,
+            "content": thread.content,
+            "file": f"{basename}/{thread.image}" if thread.image else "",
+            "is_archived": thread.is_archived,
+            "replies_amount": replies.count(),
+            "replies": [
+                {
+                    "id": reply.refnum,
+                    "author": reply.author_name,
+                    "title": reply.title,
+                    "content": reply.content,
+                    "file": f"{basename}/{thread.image}" if reply.image else ""
+                }
+                for reply in replies
+            ]
+        }
+
+        now = datetime.now()
+        filename = f"thread-id{refnum}-{now.strftime('%m-%d-%Y-%H:%M:%S')}.json"
+
+        response.content_type = 'application/json'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return dumps(thread_data, ensure_ascii=False, indent=4)
+    except Board.DoesNotExist:
+        abort(404, "Board not found.")
+    except Post.DoesNotExist:
+        abort(404, "Thread not found.")
+
+
 if __name__ == '__main__':
 
     db.connect()
