@@ -1,5 +1,11 @@
-% from utils import author_color, image_size, is_video
+% from utils import author_color, image_size, is_video, get_country_info_by_ip
 % from models import Post, Board, FavoritePost
+% from bottle import ConfigDict
+% from json import loads
+
+% config = ConfigDict()
+% config.load_config('imageboard.conf')
+% int_boards = loads(config['app.int_boards'])
 
 <div class="thread" id="{{thread.refnum}}">
   <div class="postContainer opContainer">
@@ -56,6 +62,13 @@
 
         <span class="{{name_class}}">
           <span class="name">{{thread.author_name}}</span>
+
+          % if (not thread.capcode) and (board_name in int_boards):
+            % country_name, country_code = get_country_info_by_ip(thread.author.ip)
+            % if country_name and country_code:
+                <span title="{{country_name}}" class="flag flag-{{country_code}}"></span>
+            % end
+          % end
 
           % if thread.capcode == "## Mod":
             <strong class="capcode hand id_mod" title="Highlight posts by Moderators">## Mod</strong>

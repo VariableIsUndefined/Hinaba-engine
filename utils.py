@@ -4,6 +4,7 @@ import random
 import hashlib, base64
 import shutil
 import filetype
+import requests
 from string import ascii_lowercase
 from PIL import Image
 from tripcode import tripcode
@@ -219,3 +220,15 @@ def dice(email: Optional[str]) -> str | None:
             return dice_txt
 
     return None
+
+
+def get_country_info_by_ip(ip_address):
+    try:
+        response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=5)
+        data = response.json()
+        if data['status'] == 'success':
+            return data["country"], data['countryCode'].lower()
+        return None, None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None, None

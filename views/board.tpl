@@ -1,5 +1,12 @@
 % rebase('base', title=f"/{board_name}/ - {board_title}")
 
+% from bottle import ConfigDict
+% from json import loads
+
+% config = ConfigDict()
+% config.load_config('imageboard.conf')
+% int_boards = loads(config['app.int_boards'])
+
 <head>
   % if style == "Yotsuba": 
     <link rel="stylesheet" href="{{basename}}/static/css/styles/yotsubanew.css">
@@ -13,6 +20,10 @@
     <link rel="stylesheet" href="{{basename}}/static/css/styles/tommorow.css">
   % elif style == "Photon":
     <link rel="stylesheet" href="{{basename}}/static/css/styles/photon.css">
+  % end
+
+  % if (board_name in int_boards):
+    <link rel="stylesheet" href="{{basename}}/static/css/flags.css">
   % end
 </head>
 

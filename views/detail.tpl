@@ -1,5 +1,12 @@
 % rebase('base', board_name=board_name, title=thread.title)
-% from utils import image_size
+% from utils import image_size, get_country_info_by_ip
+
+% from bottle import ConfigDict
+% from json import loads
+
+% config = ConfigDict()
+% config.load_config('imageboard.conf')
+% int_boards = loads(config['app.int_boards'])
 
 <head>
   % if style == "Yotsuba": 
@@ -15,6 +22,11 @@
   % elif style == "Photon":
     <link rel="stylesheet" href="{{basename}}/static/css/styles/photon.css">
   % end
+
+  % if (board_name in int_boards):
+    <link rel="stylesheet" href="{{basename}}/static/css/flags.css">
+  % end
+
 </head>
 
 <body class="is_index board_{{board_name}} yotsuba_new ws">
