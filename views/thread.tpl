@@ -98,8 +98,8 @@
         </span>
 
         % if f':{board_name}:' in current_user.mod:
-          (IP: {{ thread.author.ip }})
-        % end 
+          [{{ thread.author.ip }}]
+        % end
 
         <span class="dateTime">{{thread.date}}</span>
         <span class="postNum">

@@ -54,7 +54,7 @@
       </span>
 
       % if f':{board_name}:' in current_user.mod:
-      (IP: {{ thread.author.ip }})
+      [{{ thread.author.ip }}]
       % end 
 
       <span class="dateTime">{{reply.date}}</span>
