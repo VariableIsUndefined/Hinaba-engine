@@ -4,7 +4,7 @@ from utils import file_validation, remove_media, board_directory, get_directory_
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
-from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner
+from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner, News
 from datetime import datetime, timedelta, UTC
 from captcha.image import ImageCaptcha
 from random import randint, choice
@@ -1064,6 +1064,39 @@ def export_thread(board_name: str, refnum: int):
         abort(404, "Board not found.")
     except Post.DoesNotExist:
         abort(404, "Thread not found.")
+
+
+@get('/admin/edit_news')
+@view('mod/edit_news')
+def edit_news():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
+
+
+@post('/admin/edit_news')
+def do_edit_news():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    name = request.forms.get('name')
+    subject = request.forms.get('subject')
+    body = request.forms.get('body')
+
+    if not all([name, subject, body]):
+        return abort(400, "You need to enter all fields.")
+
+    data = {
+        "name": name,
+        "subject": subject,
+        "body": body,
+    }
+
+    board: News = News(**data)
+    board.save()
+
+    return redirect(f'{basename}/admin/edit_news')
 
 
 if __name__ == '__main__':

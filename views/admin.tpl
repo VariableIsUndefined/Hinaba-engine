@@ -21,6 +21,13 @@
   </fieldset>
 
   <fieldset>
+    <legend>Messages</legend>
+    <ul>
+      <li><a href="{{basename}}admin/edit_news">News</a></li>
+    </ul>
+  </fieldset>
+
+  <fieldset>
     <legend>Administration</legend>
     <li><a href="{{basename}}/admin/staff">Manage staff</a></li>
   </fieldset>

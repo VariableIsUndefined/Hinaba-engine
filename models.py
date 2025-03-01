@@ -111,6 +111,13 @@ class Banner(BaseModel):
     archived = BooleanField(default=False)
 
 
+class News(BaseModel):
+    name = CharField(null=True)
+    time = DateTimeField(default=datetime.datetime.now)
+    subject = CharField(null=True)
+    body = TextField(null=True)
+
+
 # Create tables
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner])
+    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News])
