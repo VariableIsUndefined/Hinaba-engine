@@ -4,7 +4,7 @@ from utils import file_validation, remove_media, board_directory, get_directory_
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
-from models import db, Post, Anon, Board, Report, Captcha, Category, FavoritePost, Banner
+from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner
 from datetime import datetime, timedelta, UTC
 from captcha.image import ImageCaptcha
 from random import randint, choice
@@ -23,6 +23,11 @@ basename: str = config['app.basename']
 if basename[-1] == '/': basename = basename[:-1]  # remove trailing slash
 
 STYLES: list[str] = config["style.styles"]
+
+categories = {
+    "Japanese Culture": ["a", 'c', 'w', 'm', 'cgl'],
+    "Video Games": ['v', 'vg'],
+}
 
 
 @get('/static/<filename:path>')
@@ -70,10 +75,12 @@ def home():
     show_nsfw: bool = ('True' == config['threads.show_nsfw'])
     active_content_size: int = get_directory_size('uploads')
     number_of_messages: int = Post.select().count()
+    current_user: Anon = get_current_user(request)
+
     return dict(title=config['app.title'],
                 welcome_message=config['app.welcome_message'],
                 show_nsfw=show_nsfw, active_content_size=active_content_size,
-                number_of_messages=number_of_messages, basename=basename)
+                number_of_messages=number_of_messages, basename=basename, current_user=current_user)
 
 
 @get('/captcha')
@@ -235,6 +242,14 @@ def reports(board_name: str):
                 banners=banners)
 
 
+@get('/login')
+@view('login')
+def login():
+    current_user: Anon = get_current_user(request)
+
+    return dict(current_user=current_user, basename=basename)
+
+
 @get('/admin')
 @view('admin')
 def admin_panel():
@@ -250,16 +265,181 @@ def admin_panel():
 
     return dict(boards=Board.select(), current_user=current_user,
                 board_name=None, mods=Anon.select().where(Anon.mod != ""),
-                categories=Category.select(),
                 basename=basename)
 
 
-@get('/login')
-@view('login')
-def login():
-    current_user: Anon = get_current_user(request)
+@get('/admin/edit/<board_name>')
+@view('mod/edit')
+def edit_board(board_name: str):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
 
-    return dict(current_user=current_user, basename=basename)
+    board: Board = Board.get(Board.name == board_name)
+
+    return dict(board=board, basename=basename)
+
+
+@post('/admin/edit/<board_name>')
+def do_edit(board_name: str):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    board: Board = Board.get(Board.name == board_name)
+
+    if not board:
+        return abort(404, "This board doesn't exist.")
+
+    if request.forms.get('delete'):
+        # Clicked "Delete board"
+
+        for anon in Anon.select().where(Anon.mod != ""):
+            anon.mod = anon.mod.replace(f':{board_name}:', '')
+            anon.save()
+
+        Post.delete().where(Post.board_id == board.id).execute()
+
+        board.delete_instance()
+        board_directory(board_name, remove=True)
+        print(f"Successfully deleted board {board.name}")
+    else:
+        # Clicked "Save changes"
+        title = request.forms.get('title')
+
+        if board and title:
+            board.title = title
+            board.nsfw = bool(request.forms.get("nsfw"))
+            board.save()
+            print(f"Changed /{board.name}/ title to {title}")
+
+    return redirect(f'{basename}/admin')
+
+
+@get('/admin/new-board')
+@view('mod/new_board')
+def edit_board():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
+
+
+@post('/admin/new-board')
+def do_new_board():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    uri = request.forms.get('uri')
+    title = request.forms.get('title')
+
+    if not all([uri, title]):
+        return abort(404, "URI and title are required.")
+
+    if any(char in list(punctuation + ' ') for char in title):
+        return abort(400, "Boards can't have symbols in their title.")
+
+    if Board.select().where(Board.name == uri).exists():
+        return abort(400, "A board with this uri already exists.")
+
+    data = {
+        "name": uri,
+        "nsfw": bool(request.forms.get("nsfw")),
+        "title": title.strip(),
+    }
+
+    board: Board = Board(**data)
+    board.save()
+    board_directory(uri)
+
+    print(f"New board /{board.name}/ successfully created.")
+
+    return redirect(f'{basename}/admin')
+
+
+@get('/admin/staff')
+@view('mod/manage_staff')
+def edit_board():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
+
+
+@get('/admin/staff/<id>')
+@view('mod/staff')
+def staff(id: int):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    anon = Anon.select().where(Anon.id == id, Anon.mod != "").get()
+    return dict(basename=basename, anon=anon)
+
+
+@post('/admin/staff/<id>')
+def do_staff(id: int):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    anon = Anon.select().where(Anon.id == id, Anon.mod != "").get()
+
+    if not anon:
+        return abort(404, "This user doesn't exist.")
+
+    board = request.forms.get('board')
+
+    if request.forms.get('add') and f':{board}:' not in anon.mod:
+        anon.mod += f':{board}:'
+        print(f"Adding ID:{anon.id} as mod to /{board}/")
+    elif request.forms.get('rm'):
+        anon.mod = anon.mod.replace(f':{board}:', '')
+        print(f"Removing ID:{anon.id} as mod from /{board}/")
+    elif request.forms.get('delete'):
+        anon.mod = ''
+        anon.capcode = ''
+        anon.can_capcode = False
+        print(f"Removing ID:{anon.id} as mod from database")
+    else:
+        anon.capcode = request.forms.get('capcode') if request.forms.get('capcode') else ''
+        anon.can_capcode = bool(request.forms.get('can_capcode'))
+
+        print(f"Saving changes to ID:{anon.id}")
+
+    anon.save()
+
+    return redirect(f'{basename}/admin/staff')
+
+
+@get('/admin/staff/new')
+@view('mod/new_staff')
+def new_staff():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
+
+
+@post('/admin/staff/new')
+def do_new_staff():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    ip = request.forms.get('ip')
+    can_capcode = bool(request.forms.get('can_capcode'))
+    capcode = request.forms.get('capcode')
+    board = request.forms.get('board')
+
+    anon = Anon.select().where(ip == ip).get()
+    if not anon:
+        return abort(404, "This user doesn't exist. User should make at least one post.")
+
+    if anon.mod != '':
+        return abort(403, "User is staff arleady.")
+
+    anon.mod = f":{board}:"
+    anon.capcode = capcode
+    anon.can_capcode = can_capcode
+    anon.save()
+
+    return redirect(f'{basename}/admin/staff')
 
 
 @post('/login')
@@ -585,103 +765,6 @@ def unban(board_name: str, id: int):
     return redirect(f'{basename}/{board_name}/mod')
 
 
-@post('/add_board')
-def add_board():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    name: str = request.forms.get("name").strip().lower()
-    category: str = request.forms.get("category")
-
-    if any(char in list(punctuation + ' ') for char in name):
-        return abort(400, "Boards can't have symbols in their name.")
-
-    if Board.select().where(Board.name == name).exists():
-        return abort(400, "A board with this name already exists.")
-
-    if not category:
-        return abort(400, "Please select a category.")
-
-    data = {
-        "name": name,
-        "nsfw": bool(request.forms.get("nsfw")),
-        "title": request.forms.get("title").strip(),
-        "category": category,
-    }
-
-    board: Board = Board(**data)
-    board.save()
-    board_directory(name)
-
-    return redirect(f'{basename}/admin')
-
-
-@post('/del_board/<board_name>')
-def del_board(board_name: str):
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    for anon in Anon.select().where(Anon.mod != ""):
-        anon.mod = anon.mod.replace(f':{board_name}:', '')
-        anon.save()
-
-    board: Board = Board.get(Board.name == board_name)
-
-    Post.delete().where(Post.board_id == board.id).execute()
-
-    board.delete_instance()
-    board_directory(board_name, remove=True)
-
-    return redirect(f'{basename}/admin')
-
-
-@post('/mod')
-def mod():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    ip: str = request.forms.get("ip").strip()
-    board: str = request.forms.get("board")
-    opts = request.forms
-
-    anon: Anon = Anon.get(Anon.ip == ip)
-
-    if bool(opts.get("add")) and f':{board}:' not in anon.mod:
-        anon.mod += f':{board}:'
-
-    if bool(opts.get("rm")): anon.mod = anon.mod.replace(f':{board}:', '')
-
-    if bool(opts.get("rmall")): anon.mod = ""
-
-    anon.save()
-
-    return redirect(f'{basename}/admin')
-
-
-@post('/new_mod')
-def add_mod():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    ip = request.forms.get("ip")
-    board: str = request.forms.get("board")
-    can_capcode: bool = request.forms.get("can_capcode")
-    capcode: str = request.forms.get("capcode")
-
-    try:
-        anon = Anon.get(Anon.ip == ip)
-    except:
-        return abort(404, "User does not exist.")
-
-    if f':{board}:' not in anon.mod: anon.mod += ":" + board + ":"
-    anon.can_capcode = can_capcode
-    anon.capcode = capcode
-
-    anon.save()
-
-    return redirect(f'{basename}/admin')
-
-
 @get('/<board_name>/thread/<refnum:int>/pin')
 def thread_pin(board_name: str, refnum: int):
     if f':{board_name}:' not in get_current_user(request).mod:
@@ -718,40 +801,6 @@ def thread_close(board_name: str, refnum):
     thread.save()
 
     return redirect(f'{basename}/{board_name}/')
-
-
-@post('/add_category')
-def add_category():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    name: str = request.forms.get("name").strip()
-
-    if Board.select().where(Board.name == name).exists():
-        return abort(400, "A category with this name already exists.")
-
-    data = {
-        "name": name,
-    }
-
-    category: Category = Category(**data)
-    category.save()
-
-    return redirect(f'{basename}/admin')
-
-
-@post('/del_category/<category_name>')
-def del_category(category_name: str):
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    category: Category = Category.get(Category.name == category_name)
-
-    Board.update(category='').where(Board.category == category).execute()
-
-    category.delete_instance()
-
-    return redirect(f'{basename}/admin')
 
 
 @error(404)

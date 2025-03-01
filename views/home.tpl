@@ -1,5 +1,6 @@
-% from models import Post, Board, Category
+% from models import Post, Board
 % from utils import get_size_format, short_msg, is_video
+% from backend import categories
 % rebase('base', title=title)
 <head>
   <link rel="stylesheet" href="{{basename}}/static/css/frontpage.css">
@@ -30,19 +31,23 @@
         <div class="boxcontent">
           % if Board.select().count() == 0:
             No boards have been created.
-          % end
-          % for category in Category.select():
+          % else:
+          % for category, boards in categories.items():
             <div class="column">
-              <h3 style="text-decoration: underline; display: inline;">{{category.name}}</h3>
+              <h3 style="text-decoration: underline; display: inline;">{{category}}</h3>
               <ul>
-                % for board in Board.select().where(Board.category == category.name):
-                <li>
-                  <a href="{{basename}}/{{board.name}}/" class="boardlink">{{board.title}}</a>
-                </li>
+                % for board_name in boards:
+                  % if Board.select().where(Board.name == board_name).exists():
+                    % board = Board.select().where(Board.name == board_name).get()
+                    <li>
+                      <a href="{{basename}}/{{board_name}}/" class="boardlink">{{board.title}}</a>
+                    </li>
+                  % end
                 % end
               </ul>
               <div style="clear:both;"></div>
             </div>
+          % end
           % end
         </div>
       </div>

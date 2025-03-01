@@ -34,10 +34,12 @@ elif config['database.engine'] == 'mysql':
         port=int(config['database.port'])
     )
 
+
 # Models
 class BaseModel(Model):
     class Meta:
         database = db
+
 
 class Anon(BaseModel):
     ip = IPField()
@@ -48,12 +50,13 @@ class Anon(BaseModel):
     ban_reason = CharField(null=True)
     ban_date = DateTimeField(null=True)
 
+
 class Board(BaseModel):
     name = CharField()
     title = CharField()
-    category = CharField(null=False)
     nsfw = BooleanField(default=False)
     lastrefnum = IntegerField(default=1)
+
 
 class Post(BaseModel):
     board = ForeignKeyField(Board, backref='posts')
@@ -78,18 +81,18 @@ class Post(BaseModel):
     trip = CharField(null=True)
     sec_trip = CharField(null=True)
 
+
 class Report(BaseModel):
     reason = CharField()
     refnum = IntegerField()
     date = DateTimeField()
     board = ForeignKeyField(Board, backref='reports')
 
+
 class Captcha(BaseModel):
     text = CharField()
     time_exp = DateTimeField()
 
-class Category(BaseModel):
-    name = CharField(unique=True, null=False)
 
 class FavoritePost(BaseModel):
     anon = ForeignKeyField(Anon, backref='favorites', on_delete='CASCADE')
@@ -100,12 +103,14 @@ class FavoritePost(BaseModel):
             (('anon', 'post'), True),  # Unique anon + post
         )
 
+
 class Banner(BaseModel):
     board = ForeignKeyField(Board, backref='banners', on_delete='CASCADE')
     file = CharField()
     file_name = CharField()
     archived = BooleanField(default=False)
 
+
 # Create tables
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, Category, FavoritePost, Banner])
+    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner])
