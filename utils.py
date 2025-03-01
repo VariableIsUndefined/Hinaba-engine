@@ -10,6 +10,7 @@ from PIL import Image
 from tripcode import tripcode
 from bottle import ConfigDict
 from typing import Optional, Dict, Any
+from models import ModLogs
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -232,3 +233,17 @@ def get_country_info_by_ip(ip_address):
     except Exception as e:
         print(f"Error: {e}")
         return None, None
+
+
+def log_mod_action(ip: str, board: str | None, action: str) -> None:
+    try:
+        data = {
+            "ip": ip,
+            "board": board,
+            "text": action
+        }
+
+        mod_logs = ModLogs(**data)
+        mod_logs.save()
+    except Exception as e:
+        print(f"Error: {e}")

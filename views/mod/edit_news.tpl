@@ -21,10 +21,26 @@
       </form>
     </fieldset>
 
-     % for neww in News.select().order_by(News.id.desc()):
+     % for post in News.select().order_by(News.time.desc()):
        <div class="ban">
-         <h2 id="{{neww.id}}"><small class="unimportant"><a href="#{{neww.id}}">#</a></small> {{neww.subject}} <small class="unimportant">— by {{neww.name}} at {{neww.time.strftime("%m/%d/%y (%a) %H:%M:%S")}} </small></h2>
-         <p>{{neww.body}}</p>
+         <span style="float:right;padding:2px">
+           <a class="unimportant" href="{{basename}}/admin/edit_news/delete/{{post.id}}">[delete]</a>
+         </span>
+         <h2 id="{{post.id}}">
+           <small class="unimportant">
+             <a href="#{{post.id}}">#</a>
+           </small>
+
+           % if post.subject:
+             {{post.subject}}
+           % else:
+             <em>no subject</em>
+           % end
+           <small class="unimportant">
+              — by {{post.name}} at {{post.time.strftime("%m/%d/%y (%a) %H:%M:%S")}}
+           </small>
+         </h2>
+         <p>{{post.body}}</p>
        </div>
      % end
 </body>

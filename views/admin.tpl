@@ -30,6 +30,7 @@
   <fieldset>
     <legend>Administration</legend>
     <li><a href="{{basename}}/admin/staff">Manage staff</a></li>
+    <li><a href="{{basename}}/admin/log">Moderation log</a></li>
   </fieldset>
 
   <fieldset><legend>User account</legend><ul><li><form action="{{basename}}/logout" method="POST"><input type="submit" value="Log out">

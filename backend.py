@@ -1,6 +1,6 @@
 from bottle import (run, static_file, request, view, redirect,
                     abort, get, post, ConfigDict, response, default_app, error, template, route)
-from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice
+from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice, log_mod_action
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
@@ -448,7 +448,7 @@ def do_login():
 
     if password == config['admin.password']:
         response.set_cookie("logged", config['admin.token'])
-
+        log_mod_action(get_current_user(request).ip, None, "Logged in")
         return redirect(f'{basename}/admin')
 
     return redirect(f'{basename}/login')
@@ -457,6 +457,7 @@ def do_login():
 @post('/logout')
 def do_logout():
     response.delete_cookie('logged')
+    log_mod_action(get_current_user(request).ip, None, "Logged out")
 
     return redirect(f'{basename}/')
 
@@ -744,6 +745,8 @@ def ban(board_name: str):
     Anon.update(banned=True, ban_reason=reason, ban_date=datetime.now().replace(microsecond=0)).where(
         Anon.id == int(user)).execute()
 
+    log_mod_action(get_current_user(request).ip, board_name, f"Banned user ID:{user} for {reason}")
+
     return redirect(f'{basename}/{board_name}/mod')
 
 
@@ -761,6 +764,8 @@ def unban(board_name: str, id: int):
 
     if bool(form.get("unban")):
         Anon.update(banned=False, ban_reason=None, ban_date=None).where(Anon.id == id).execute()
+        log_mod_action(get_current_user(request).ip, board_name, f"Unbanned user ID:{id}")
+
 
     return redirect(f'{basename}/{board_name}/mod')
 
@@ -776,7 +781,9 @@ def thread_pin(board_name: str, refnum: int):
 
     if thread.pinned:
         thread.pinned = False
+        log_mod_action(get_current_user(request).ip, board_name, f"Unpinned thread {refnum}")
     else:
+        log_mod_action(get_current_user(request).ip, board_name, f"Pinned thread {refnum}")
         thread.pinned = True
 
     thread.save()
@@ -795,8 +802,10 @@ def thread_close(board_name: str, refnum):
 
     if thread.closed:
         thread.closed = False
+        log_mod_action(get_current_user(request).ip, board_name, f"Unclosed thread {refnum}")
     else:
         thread.closed = True
+        log_mod_action(get_current_user(request).ip, board_name, f"Closed thread {refnum}")
 
     thread.save()
 
@@ -900,6 +909,8 @@ def upload_banner(board_name: str):
 
     Banner.create(board=board, file=file_path, file_name=upload.filename)
 
+    log_mod_action(get_current_user(request).ip, board_name, f"Uploaded banner {upload.filename}")
+
     return redirect(f"{basename}/{board_name}/mod")
 
 
@@ -916,28 +927,9 @@ def del_banner(board_name: str, banner_id: int):
     banner: Banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
     banner.delete_instance()
 
-    return redirect(f"{basename}/{board_name}/mod")
-
-
-@post('/<board_name>/unarch_banner/<banner_id>')
-def unarchive_banner(board_name: str, banner_id: int):
-    if f':{board_name}:' not in get_current_user(request).mod:
-        return abort(403, "You are not allowed to do this.")
-
-    try:
-        board: Board = Board.get(Board.name == board_name)
-    except:
-        return abort(400, "The board does not exist.")
-
-    try:
-        banner: Banner = Banner.get((Banner.board == board) & (Banner.id == banner_id))
-    except:
-        return abort(400, "The banner does not exist.")
-
-    Banner.update(archived=False).where(Banner.id == banner_id).execute()
+    log_mod_action(get_current_user(request).ip, board_name, f"Deleted banner {banner.file_name}")
 
     return redirect(f"{basename}/{board_name}/mod")
-
 
 @post('/<board_name>/arch_banner/<banner_id>')
 def archive_banner(board_name: str, banner_id: int):
@@ -954,7 +946,14 @@ def archive_banner(board_name: str, banner_id: int):
     except:
         return abort(400, "The banner does not exist.")
 
-    Banner.update(archived=True).where(Banner.id == banner_id).execute()
+    if banner.archived:
+        log_mod_action(get_current_user(request).ip, board_name, f"Unarchived banner {banner.file_name}")
+        banner.archived = False
+    else:
+        log_mod_action(get_current_user(request).ip, board_name, f"Archived banner {banner.file_name}")
+        banner.archived = True
+
+    banner.save()
 
     return redirect(f"{basename}/{board_name}/mod")
 
@@ -965,7 +964,6 @@ def archive_banner(board_name: str, banner_id: int):
 def set_style(style_name: str):
     if style_name in STYLES:
         response.set_cookie('style', style_name, path="/", max_age=3600)
-
     return ''
 
 
@@ -1001,6 +999,7 @@ def archive_thread(board_name: str, refnum: int):
 
     try:
         Post.update(is_archived=True).where(Post.refnum == refnum, Post.is_reply == False).execute()
+        log_mod_action(get_current_user(request).ip, board_name, f"Archived thread {refnum}")
     except Post.DoesNotExist:
         response.status = 404
     except IntegrityError:
@@ -1016,6 +1015,8 @@ def unarchive_thread(board_name: str, refnum: int):
 
     try:
         Post.update(is_archived=False).where(Post.refnum == refnum, Post.is_reply == False).execute()
+        log_mod_action(get_current_user(request).ip, board_name, f"Unarchived thread {refnum}")
+
     except Post.DoesNotExist:
         response.status = 404
     except IntegrityError:
@@ -1084,7 +1085,7 @@ def do_edit_news():
     subject = request.forms.get('subject')
     body = request.forms.get('body')
 
-    if not all([name, subject, body]):
+    if not all([name, body]):
         return abort(400, "You need to enter all fields.")
 
     data = {
@@ -1096,8 +1097,27 @@ def do_edit_news():
     board: News = News(**data)
     board.save()
 
+    log_mod_action(get_current_user(request).ip, None, f"Posted a news entry")
+
     return redirect(f'{basename}/admin/edit_news')
 
+@get('/admin/edit_news/delete/<id:int>')
+def delete_news(id: int):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    News.delete().where(News.id == id).execute()
+    log_mod_action(get_current_user(request).ip, None, f"Deleted a news entry")
+
+    return redirect(f'{basename}/admin/edit_news')
+
+@get('/admin/log')
+@view('mod/mod_log')
+def edit_news():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
 
 if __name__ == '__main__':
 

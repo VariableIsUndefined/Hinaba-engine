@@ -116,7 +116,7 @@
         % end
         <td>
           % if banner.archived:
-            <form action="{{basename}}/{{board_name}}/unarch_banner/{{banner.id}}" method="POST">
+            <form action="{{basename}}/{{board_name}}/arch_banner/{{banner.id}}" method="POST">
               <input type="submit" value="Unarchive">
             </form>
           % else:

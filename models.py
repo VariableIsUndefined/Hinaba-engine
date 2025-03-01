@@ -117,7 +117,13 @@ class News(BaseModel):
     subject = CharField(null=True)
     body = TextField(null=True)
 
+class ModLogs(BaseModel):
+    ip = IPField()
+    board = CharField(null=True)
+    time = DateTimeField(default=datetime.datetime.now)
+    text = TextField()
+
 
 # Create tables
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News])
+    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News, ModLogs])

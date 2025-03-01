@@ -34,9 +34,8 @@ Hinaba is a powerful and flexible imageboard engine written in Python, packed wi
 Planned features:
 
 - Role system: Janitor, Moderator, Administrator.
-- API and live thread updates.
+- API and live threads.
 - Oekaki (drawing in the browser).
-- Moderator action logging.
 - Individual board settings: bump limits, file size caps, message length, rules, etc.
 
 ### ⚠️ Warning
