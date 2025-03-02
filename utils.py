@@ -4,33 +4,15 @@ import random
 import hashlib, base64
 import shutil
 import filetype
-import requests
 from string import ascii_lowercase
 from PIL import Image
 from tripcode import tripcode
 from bottle import ConfigDict
 from typing import Optional, Dict, Any
-from models import ModLogs, Anon, PrivateMessage
+import requests
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
-
-
-def get_current_user(req):
-    ip = req.get('HTTP_X_FORWARDED_FOR')
-
-    if ip is None: ip = req.get('REMOTE_ADDR')
-
-    try:
-        current_user = Anon.get(Anon.ip == ip)
-    except:
-        anon = Anon(ip=ip)
-        anon.save()
-
-        current_user = anon
-
-    return current_user
-
 
 def check_admin(req):
     logged_cookie = req.get_cookie("logged")
@@ -246,7 +228,6 @@ def dice(email: Optional[str]) -> str | None:
 
     return None
 
-
 def get_country_info_by_ip(ip_address):
     try:
         response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=5)
@@ -257,31 +238,3 @@ def get_country_info_by_ip(ip_address):
     except Exception as e:
         print(f"Error: {e}")
         return None, None
-
-
-def log_mod_action(ip: str, board: str | None, action: str) -> None:
-    try:
-        data = {
-            "ip": ip,
-            "board": board,
-            "text": action
-        }
-
-        mod_logs = ModLogs(**data)
-        mod_logs.save()
-    except Exception as e:
-        print(f"Error: {e}")
-
-
-def send_private_message(sender: int, reciever: int, message: str) -> None:
-    try:
-        data = {
-            "sender": sender,
-            "to": reciever,
-            "message": message
-        }
-
-        private_message = PrivateMessage(**data)
-        private_message.save()
-    except Exception as e:
-        print(f"Error: {e}")

@@ -1,7 +1,8 @@
 from bottle import (run, static_file, request, view, redirect,
                     abort, get, post, ConfigDict, response, default_app, error, template, route)
 from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice, \
-    log_mod_action, get_current_user, check_admin, send_private_message
+    check_admin
+from functions import log_mod_action, send_private_message, get_current_user
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
