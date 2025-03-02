@@ -117,6 +117,7 @@ class News(BaseModel):
     subject = CharField(null=True)
     body = TextField(null=True)
 
+
 class ModLogs(BaseModel):
     ip = IPField()
     board = CharField(null=True)
@@ -124,6 +125,14 @@ class ModLogs(BaseModel):
     text = TextField()
 
 
+class PrivateMessage(BaseModel):
+    sender = IntegerField()
+    to = IntegerField()
+    message = CharField()
+    time = DateTimeField(default=datetime.datetime.now)
+    unread = BooleanField(default=True)
+
+
 # Create tables
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News, ModLogs])
+    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News, ModLogs, PrivateMessage])

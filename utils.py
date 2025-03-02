@@ -10,10 +10,34 @@ from PIL import Image
 from tripcode import tripcode
 from bottle import ConfigDict
 from typing import Optional, Dict, Any
-from models import ModLogs
+from models import ModLogs, Anon, PrivateMessage
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
+
+
+def get_current_user(req):
+    ip = req.get('HTTP_X_FORWARDED_FOR')
+
+    if ip is None: ip = req.get('REMOTE_ADDR')
+
+    try:
+        current_user = Anon.get(Anon.ip == ip)
+    except:
+        anon = Anon(ip=ip)
+        anon.save()
+
+        current_user = anon
+
+    return current_user
+
+
+def check_admin(req):
+    logged_cookie = req.get_cookie("logged")
+    if bool(logged_cookie):
+        if logged_cookie != config['admin.token']: return 1
+    else:
+        return 1
 
 
 def thumbnail(path: str, refnum: int, ext: str, is_reply: bool = False) -> None:
@@ -245,5 +269,19 @@ def log_mod_action(ip: str, board: str | None, action: str) -> None:
 
         mod_logs = ModLogs(**data)
         mod_logs.save()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def send_private_message(sender: int, reciever: int, message: str) -> None:
+    try:
+        data = {
+            "sender": sender,
+            "to": reciever,
+            "message": message
+        }
+
+        private_message = PrivateMessage(**data)
+        private_message.save()
     except Exception as e:
         print(f"Error: {e}")

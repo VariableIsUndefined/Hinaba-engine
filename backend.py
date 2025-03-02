@@ -1,19 +1,20 @@
 from bottle import (run, static_file, request, view, redirect,
                     abort, get, post, ConfigDict, response, default_app, error, template, route)
-from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice, log_mod_action
+from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice, \
+    log_mod_action, get_current_user, check_admin, send_private_message
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
-from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner, News
+from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner, News, PrivateMessage
 from datetime import datetime, timedelta, UTC
 from captcha.image import ImageCaptcha
 from random import randint, choice
-from peewee import IntegrityError, Query
+from peewee import IntegrityError
 from uuid import uuid4
-from apscheduler.schedulers.background import BackgroundScheduler
 from typing import Optional, Dict
 
-ARCHIVE_RETENTION_DAYS: int = 7
+from middleware.middleware import fix_environ_middleware
+from jobs.scheduler import start_scheduler
 
 config = ConfigDict()
 config.load_config('imageboard.conf')
@@ -43,30 +44,6 @@ def send_upload(filename: path):
 @get('/banners/<board_name>/<file_name>')
 def serve_banner(board_name: str, file_name: str):
     return static_file(file_name, root=path.join("banners", board_name))
-
-
-def get_current_user(req: request) -> Anon:
-    ip = req.get('HTTP_X_FORWARDED_FOR')
-
-    if ip is None: ip = req.get('REMOTE_ADDR')
-
-    try:
-        current_user = Anon.get(Anon.ip == ip)
-    except:
-        anon = Anon(ip=ip)
-        anon.save()
-
-        current_user = anon
-
-    return current_user
-
-
-def check_admin(req: request) -> Anon | int:
-    logged_cookie = req.get_cookie("logged")
-    if bool(logged_cookie):
-        if logged_cookie != config['admin.token']: return 1
-    else:
-        return 1
 
 
 @get('/')
@@ -247,7 +224,7 @@ def reports(board_name: str):
 def login():
     current_user: Anon = get_current_user(request)
 
-    return dict(current_user=current_user, basename=basename)
+    return dict(current_user=current_user, basename=basename, error=None)
 
 
 @get('/admin')
@@ -444,6 +421,8 @@ def do_new_staff():
 
 @post('/login')
 def do_login():
+    current_user: Anon = get_current_user(request)
+
     password: str = request.forms.get("password")
 
     if password == config['admin.password']:
@@ -451,7 +430,8 @@ def do_login():
         log_mod_action(get_current_user(request).ip, None, "Logged in")
         return redirect(f'{basename}/admin')
 
-    return redirect(f'{basename}/login')
+    return template('login.tpl', current_user=current_user, basename=basename,
+                    error='Invalid username and/or password.')
 
 
 @post('/logout')
@@ -766,7 +746,6 @@ def unban(board_name: str, id: int):
         Anon.update(banned=False, ban_reason=None, ban_date=None).where(Anon.id == id).execute()
         log_mod_action(get_current_user(request).ip, board_name, f"Unbanned user ID:{id}")
 
-
     return redirect(f'{basename}/{board_name}/mod')
 
 
@@ -931,6 +910,7 @@ def del_banner(board_name: str, banner_id: int):
 
     return redirect(f"{basename}/{board_name}/mod")
 
+
 @post('/<board_name>/arch_banner/<banner_id>')
 def archive_banner(board_name: str, banner_id: int):
     if f':{board_name}:' not in get_current_user(request).mod:
@@ -967,7 +947,7 @@ def set_style(style_name: str):
     return ''
 
 
-# -- Archive -- #
+# -- Thread Archive -- #
 @get('/<board_name>/archive')
 @view('archive')
 def get_archive(board_name: str):
@@ -991,6 +971,8 @@ def get_archive(board_name: str):
                 style=current_style,
                 )
 
+
+# -- Thread archiving -- #
 
 @get('/<board_name>/archive/<refnum:int>')
 def archive_thread(board_name: str, refnum: int):
@@ -1067,6 +1049,8 @@ def export_thread(board_name: str, refnum: int):
         abort(404, "Thread not found.")
 
 
+# -- News (for staff) -- #
+
 @get('/admin/edit_news')
 @view('mod/edit_news')
 def edit_news():
@@ -1101,6 +1085,7 @@ def do_edit_news():
 
     return redirect(f'{basename}/admin/edit_news')
 
+
 @get('/admin/edit_news/delete/<id:int>')
 def delete_news(id: int):
     if check_admin(request) == 1:
@@ -1111,6 +1096,9 @@ def delete_news(id: int):
 
     return redirect(f'{basename}/admin/edit_news')
 
+
+# -- Mod actions logging -- #
+
 @get('/admin/log')
 @view('mod/mod_log')
 def edit_news():
@@ -1118,6 +1106,102 @@ def edit_news():
         return abort(403, "You are not allowed to do this.")
 
     return dict(basename=basename)
+
+
+# -- Private Messages -- #
+
+@get('/admin/inbox')
+@view('mod/inbox')
+def inbox():
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename, current_user=get_current_user(request))
+
+
+# View PM
+
+@get('/admin/PM/<message_id>')
+@view('mod/PM')
+def PM(message_id):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    message: PrivateMessage = PrivateMessage.select().where(PrivateMessage.id == message_id)
+
+    if not message.exists():
+        return abort(404, "Message not found.")
+
+    message = message.get()
+
+    if message.unread:
+        message.unread = False
+        message.save()
+
+    return dict(basename=basename, message=message)
+
+
+# PM delete
+
+@post('/admin/PM/<message_id>')
+def do_PM(message_id):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    if request.forms.get('delete'):
+        PrivateMessage.delete().where(PrivateMessage.id == message_id,
+                                      PrivateMessage.to == get_current_user(request).id).execute()
+
+    return redirect(f'{basename}/admin/inbox')
+
+
+# PM reply
+
+@get('/admin/PM/<message_id>/reply')
+def PM_reply(message_id):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    message: PrivateMessage = PrivateMessage.select().where(PrivateMessage.id == message_id)
+
+    if not message.exists():
+        return abort(404, "Message not found.")
+
+    reciever: Anon = Anon.select().where(Anon.id == message.get().sender).get()
+
+    return template('mod/new_PM.tpl', basename=basename, reciever=reciever,
+                    reply=f">{message.get().message}\n")
+
+
+# New PM
+
+@get('/admin/new_PM/<reciever_id>')
+@view('mod/new_PM')
+def new_PM(reciever_id):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    reciever: Anon = Anon.select().where(Anon.id == reciever_id).get()
+
+    return dict(basename=basename, reciever=reciever, reply='')
+
+
+@post('/admin/new_PM/<reciever_id>')
+def do_new_PM(reciever_id):
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    message = request.forms.get('message')
+
+    if not message:
+        return abort(400, "You need to enter message.")
+
+    sender: Anon = get_current_user(request)
+
+    send_private_message(sender.id, reciever_id, message)
+
+    return redirect(f'{basename}/admin')
+
 
 if __name__ == '__main__':
 
@@ -1128,53 +1212,9 @@ if __name__ == '__main__':
 
     url_prefix: str = basename
 
-
-    def fix_environ_middleware(app):
-        def fixed_app(environ, start_response):
-            path: str = environ['PATH_INFO']
-            if path.startswith("/"):
-                # strip extra slashes at the beginning of a path that starts
-                # with any number of slashes
-                path = "/" + path.lstrip("/")
-
-            if url_prefix:
-                # NB: url_prefix is guaranteed by the configuration machinery to
-                # be either the empty string or a string that starts with a single
-                # slash and ends without any slashes
-                if path == url_prefix:
-                    # if the path is the same as the url prefix, the SCRIPT_NAME
-                    # should be the url_prefix and PATH_INFO should be empty
-                    path = ""
-                else:
-                    # if the path starts with the url prefix plus a slash,
-                    # the SCRIPT_NAME should be the url_prefix and PATH_INFO should
-                    # the value of path from the slash until its end
-                    url_prefix_with_trailing_slash = url_prefix + "/"
-                    if path.startswith(url_prefix_with_trailing_slash):
-                        path = path[len(url_prefix):]
-            environ['SCIPT_NAME'] = url_prefix
-            environ['PATH_INFO'] = path
-            return app(environ, start_response)
-
-        return fixed_app
-
-
-    # Archive cleanup job
-    def cleanup_archived_threads():
-        cutoff_date = datetime.now() - timedelta(days=ARCHIVE_RETENTION_DAYS)
-        query = Post.delete().where(Post.is_archived == True, Post.bumped_at < cutoff_date)
-        deleted_count = query.execute()
-        print(f"Deleted {deleted_count} archived threads older than {ARCHIVE_RETENTION_DAYS} days")
-
-
-    # Scheduler for periodic cleanup
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(cleanup_archived_threads, 'interval', days=7)
-    scheduler.start()
-
     app = default_app()
-    app.wsgi = fix_environ_middleware(app.wsgi)
-
+    app.wsgi = fix_environ_middleware(app.wsgi, url_prefix)
+    start_scheduler()
     production = bool(int(config['app.production']))
 
     run(

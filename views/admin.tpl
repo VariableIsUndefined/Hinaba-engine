@@ -1,6 +1,6 @@
 % rebase('base', title="Dashboard")
-% from models import Board
-
+% from models import Board, PrivateMessage
+% unread_messages = PrivateMessage.select().where(PrivateMessage.to == current_user.id, PrivateMessage.unread == True)
 <head>
   <link rel="stylesheet" href="{{basename}}/static/css/style.css">
 </head>
@@ -24,6 +24,13 @@
     <legend>Messages</legend>
     <ul>
       <li><a href="{{basename}}admin/edit_news">News</a></li>
+      <li><a href="{{ basename }}/admin/inbox">PM inbox
+       % if unread_messages.exists():
+         <strong>({{ unread_messages.count() }} unread) </strong>
+       % else:
+           <strong>(0 unread) </strong>
+       % end
+       </a></li>
     </ul>
   </fieldset>
 

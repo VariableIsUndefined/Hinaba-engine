@@ -11,6 +11,10 @@
      <div class="subtitle"></div>
     </header>
 
+    % if error:
+    <h2 style="text-align:center">{{ error }}</h2>
+    % end
+
     <form class="Login" action="{{basename}}/login" method="POST">
       <table style="margin-top:25px;">
         <tbody>

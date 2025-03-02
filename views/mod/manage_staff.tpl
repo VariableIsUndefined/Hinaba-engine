@@ -21,6 +21,7 @@
             <td>{{anon.capcode}}</td>
             <td>
               <a class="unimportant" style="margin-left:5px;float:right"  href="{{basename}}/admin/staff/{{anon.id}}">[edit]</a>
+              <a class="unimportant" style="margin-left:5px;float:right" href="{{basename}}/admin/new_PM/{{anon.id}}">[PM]</a>
             </td>
           </tr>
         % end
