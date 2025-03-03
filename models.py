@@ -133,6 +133,13 @@ class PrivateMessage(BaseModel):
     unread = BooleanField(default=True)
 
 
+class Staff(BaseModel):
+    username = CharField(unique=True)
+    password = CharField()
+    type = CharField()
+    anon = ForeignKeyField(Anon, backref='staff', on_delete='CASCADE', unique=True)
+
+
 # Create tables
 with db:
-    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News, ModLogs, PrivateMessage])
+    db.create_tables([Report, Post, Board, Anon, Captcha, FavoritePost, Banner, News, ModLogs, PrivateMessage, Staff])

@@ -18,6 +18,7 @@
     <form class="Login" action="{{basename}}/login" method="POST">
       <table style="margin-top:25px;">
         <tbody>
+          <tr><th>Username</th><td><input type="text" name="username" size="20" maxlength="30" value=""></td></tr>
           <tr><th>Password</th><td><input type="password" name="password" size="20" maxlength="30"><br><br></td></tr>
           <tr><td></td><td><input type="submit" name="login" value="Continue"></td></tr>
         </tbody>

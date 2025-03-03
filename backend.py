@@ -2,11 +2,11 @@ from bottle import (run, static_file, request, view, redirect,
                     abort, get, post, ConfigDict, response, default_app, error, template, route)
 from utils import file_validation, remove_media, board_directory, get_directory_size, generate_trip, dice, \
     check_admin
-from functions import log_mod_action, send_private_message, get_current_user
+from functions import log_mod_action, send_private_message, get_current_user, hash_password, has_permissions
 from json import loads, dumps
 from os import path, mkdir, makedirs
 from string import punctuation
-from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner, News, PrivateMessage
+from models import db, Post, Anon, Board, Report, Captcha, FavoritePost, Banner, News, PrivateMessage, Staff
 from datetime import datetime, timedelta, UTC
 from captcha.image import ImageCaptcha
 from random import randint, choice
@@ -225,6 +225,11 @@ def reports(board_name: str):
 def login():
     current_user: Anon = get_current_user(request)
 
+    # Creates Default ADMIN User
+    if not Staff.select().where(Staff.username == "admin").exists():
+        Staff(username="admin", password=hash_password("password"), type="Admin",
+              anon=get_current_user(request)).save()
+
     return dict(current_user=current_user, basename=basename, error=None)
 
 
@@ -232,6 +237,7 @@ def login():
 @view('admin')
 def admin_panel():
     current_user: Anon = get_current_user(request)
+    staff: Staff = Staff.get(Staff.anon == current_user)
 
     logged_cookie: str = request.get_cookie("logged")
 
@@ -242,7 +248,7 @@ def admin_panel():
         return redirect(f'{basename}/')
 
     return dict(boards=Board.select(), current_user=current_user,
-                board_name=None, mods=Anon.select().where(Anon.mod != ""),
+                board_name=None, staff_type=staff.type,
                 basename=basename)
 
 
@@ -333,104 +339,18 @@ def do_new_board():
     return redirect(f'{basename}/admin')
 
 
-@get('/admin/staff')
-@view('mod/manage_staff')
-def edit_board():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    return dict(basename=basename)
-
-
-@get('/admin/staff/<id>')
-@view('mod/staff')
-def staff(id: int):
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    anon = Anon.select().where(Anon.id == id, Anon.mod != "").get()
-    return dict(basename=basename, anon=anon)
-
-
-@post('/admin/staff/<id>')
-def do_staff(id: int):
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    anon = Anon.select().where(Anon.id == id, Anon.mod != "").get()
-
-    if not anon:
-        return abort(404, "This user doesn't exist.")
-
-    board = request.forms.get('board')
-
-    if request.forms.get('add') and f':{board}:' not in anon.mod:
-        anon.mod += f':{board}:'
-        print(f"Adding ID:{anon.id} as mod to /{board}/")
-    elif request.forms.get('rm'):
-        anon.mod = anon.mod.replace(f':{board}:', '')
-        print(f"Removing ID:{anon.id} as mod from /{board}/")
-    elif request.forms.get('delete'):
-        anon.mod = ''
-        anon.capcode = ''
-        anon.can_capcode = False
-        print(f"Removing ID:{anon.id} as mod from database")
-    else:
-        anon.capcode = request.forms.get('capcode') if request.forms.get('capcode') else ''
-        anon.can_capcode = bool(request.forms.get('can_capcode'))
-
-        print(f"Saving changes to ID:{anon.id}")
-
-    anon.save()
-
-    return redirect(f'{basename}/admin/staff')
-
-
-@get('/admin/staff/new')
-@view('mod/new_staff')
-def new_staff():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    return dict(basename=basename)
-
-
-@post('/admin/staff/new')
-def do_new_staff():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    ip = request.forms.get('ip')
-    can_capcode = bool(request.forms.get('can_capcode'))
-    capcode = request.forms.get('capcode')
-    board = request.forms.get('board')
-
-    anon = Anon.select().where(ip == ip).get()
-    if not anon:
-        return abort(404, "This user doesn't exist. User should make at least one post.")
-
-    if anon.mod != '':
-        return abort(403, "User is staff arleady.")
-
-    anon.mod = f":{board}:"
-    anon.capcode = capcode
-    anon.can_capcode = can_capcode
-    anon.save()
-
-    return redirect(f'{basename}/admin/staff')
-
-
 @post('/login')
 def do_login():
     current_user: Anon = get_current_user(request)
 
+    username: str = request.forms.get('username')
     password: str = request.forms.get("password")
 
-    if password == config['admin.password']:
+    staff = Staff.select().where(Staff.username == username)
+    if staff.exists() and hash_password(password) == staff.get().password:
         response.set_cookie("logged", config['admin.token'])
         log_mod_action(get_current_user(request).ip, None, "Logged in")
         return redirect(f'{basename}/admin')
-
     return template('login.tpl', current_user=current_user, basename=basename,
                     error='Invalid username and/or password.')
 
@@ -1050,6 +970,111 @@ def export_thread(board_name: str, refnum: int):
         abort(404, "Thread not found.")
 
 
+# -- Staff Management -- #
+
+@get('/admin/staff')
+@view('mod/manage_staff')
+def manage_staff():
+    return dict(basename=basename)
+
+
+@get('/admin/staff/<id>')
+@view('mod/staff')
+def staff(id: int):
+    staff: Staff = Staff.get(Staff.anon == get_current_user(request))
+    if not has_permissions(staff.type, "managestaff"):
+        return redirect(f"{basename}/admin")
+
+    c_staff = Staff.get(Staff.id == id)
+    anon = Anon.select().where(Anon.id == staff.anon.id).get()
+    return dict(basename=basename, anon=anon, staff=c_staff, staff_type=staff.type)
+
+
+@post('/admin/staff/<id>')
+def do_staff(id: int):
+    staff = Staff.get(Staff.id == id)
+    anon = Anon.select().where(Anon.id == staff.anon.id).get()
+
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+    board = request.forms.get('board')
+
+    if request.forms.get('add') and f':{board}:' not in anon.mod:
+        anon.mod += f':{board}:'
+        print(f"Adding ID:{anon.id} as mod to /{board}/")
+    elif request.forms.get('rm'):
+        anon.mod = anon.mod.replace(f':{board}:', '')
+        print(f"Removing ID:{anon.id} as mod from /{board}/")
+    elif request.forms.get('delete'):
+        anon.mod = ''
+        anon.capcode = ''
+        anon.can_capcode = False
+        Staff.delete().where(Staff.id == id).execute()
+        print(f"Removing ID:{anon.id} as mod from database")
+    else:
+        anon.capcode = request.forms.get('capcode') if request.forms.get('capcode') else ''
+        anon.can_capcode = bool(request.forms.get('can_capcode'))
+        staff.username = username
+        staff.password = hash_password(password)
+        staff.save()
+        print(f"Saving changes to ID:{anon.id}")
+
+    anon.save()
+
+    return redirect(f'{basename}/admin/staff')
+
+
+@get('/admin/staff/new')
+@view('mod/new_staff')
+def new_staff():
+    staff: Staff = Staff.get(Staff.anon == get_current_user(request))
+    if not has_permissions(staff.type, "managestaff"):
+        return redirect(f"{basename}/admin")
+
+    if check_admin(request) == 1:
+        return abort(403, "You are not allowed to do this.")
+
+    return dict(basename=basename)
+
+
+@post('/admin/staff/new')
+def do_new_staff():
+    staff: Staff = Staff.get(Staff.anon == get_current_user(request))
+    if not has_permissions(staff.type, "managestaff"):
+        return redirect(f"{basename}/admin")
+
+    ip = request.forms.get('ip')
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+    type = request.forms.get('type')
+    can_capcode = bool(request.forms.get('can_capcode'))
+    capcode = request.forms.get('capcode')
+    board = request.forms.get('board')
+
+    if not all([username, password, type]):
+        return abort(403, "Username/Password and Group is required.")
+
+    if Staff.select().where(Staff.username == username).exists():
+        return abort(403, "User with that name is a staff arleady.")
+
+    anon = Anon.select().where(Anon.ip == ip)
+    if anon.exists():
+        anon = anon.get()
+    else:
+        anon = Anon(ip=ip)
+    if board:
+        anon.mod = f":{board}:"
+
+    anon.capcode = capcode
+    anon.can_capcode = can_capcode
+    anon.save()
+
+    new_staff = Staff(username=username, password=hash_password(password), type=type, anon=anon)
+    new_staff.save()
+
+    return redirect(f'{basename}/admin/staff')
+
+
 # -- News (for staff) -- #
 
 @get('/admin/edit_news')
@@ -1102,11 +1127,11 @@ def delete_news(id: int):
 
 @get('/admin/log')
 @view('mod/mod_log')
-def edit_news():
-    if check_admin(request) == 1:
-        return abort(403, "You are not allowed to do this.")
-
-    return dict(basename=basename)
+def mod_log():
+    staff: Staff = Staff.get(Staff.anon == get_current_user(request))
+    if has_permissions(staff.type, "modlog"):
+        return dict(basename=basename)
+    return redirect(f'{basename}/admin')
 
 
 # -- Private Messages -- #
